@@ -67,3 +67,8 @@ composer.lock
 # Backup files
 *.bak
 *backup*
+
+# Documentation and project files
+CLAUDE.md
+CHANGELOG.md
+TROUBLESHOOTING.md

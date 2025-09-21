@@ -203,7 +203,8 @@ function headless_pro_load_modules()
         'post-types.php',
         'acf-fields.php',
         'admin.php',
-        'api.php'
+        'api.php',
+        'frontend-redirect.php'
     );
 
     foreach ($modules as $module) {
