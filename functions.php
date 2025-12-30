@@ -187,6 +187,9 @@ class HeadlessProCORS
             'http://localhost:3001',
             'https://edrishusein.com',
             'https://www.edrishusein.com',
+            'https://magical-swirles.82-165-132-190.plesk.page',
+            'http://82.165.132.190',
+            'https://82.165.132.190',
         );
 
         return apply_filters('headless_pro_allowed_origins', $origins);
