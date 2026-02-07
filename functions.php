@@ -6,7 +6,7 @@
  * Modern, secure WordPress theme for headless/JAMstack projects
  * 
  * @package HeadlessPro
- * @version 1.0.0
+ * @version 2.1.0
  */
 
 if (!defined('ABSPATH')) {
@@ -14,9 +14,46 @@ if (!defined('ABSPATH')) {
 }
 
 // Theme constants
-define('HEADLESS_THEME_VERSION', '1.0.0');
+define('HEADLESS_THEME_VERSION', wp_get_theme()->get('Version'));
 define('HEADLESS_THEME_PATH', get_template_directory());
 define('HEADLESS_THEME_URL', get_template_directory_uri());
+
+/**
+ * Centralized Configuration
+ *
+ * Reads from wp-config.php constants with sensible defaults.
+ * Define these in wp-config.php to override:
+ *   - HEADLESS_FRONTEND_URL  (string, default: 'https://edrishusein.com')
+ *   - HEADLESS_ALLOWED_ORIGINS (comma-separated string)
+ */
+class HeadlessProConfig
+{
+    private static $default_origins = array(
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://edrishusein.com',
+        'https://www.edrishusein.com',
+        'https://magical-swirles.82-165-132-190.plesk.page',
+        'http://82.165.132.190',
+        'https://82.165.132.190',
+    );
+
+    public static function get_frontend_url()
+    {
+        if (defined('HEADLESS_FRONTEND_URL')) {
+            return rtrim(HEADLESS_FRONTEND_URL, '/');
+        }
+        return 'https://edrishusein.com';
+    }
+
+    public static function get_allowed_origins()
+    {
+        if (defined('HEADLESS_ALLOWED_ORIGINS') && !empty(HEADLESS_ALLOWED_ORIGINS)) {
+            return array_map('trim', explode(',', HEADLESS_ALLOWED_ORIGINS));
+        }
+        return self::$default_origins;
+    }
+}
 
 /**
  * Theme Setup
@@ -151,48 +188,48 @@ new HeadlessProPerformance();
 
 /**
  * CORS Configuration for Headless Apps
+ *
+ * Single source of truth for all CORS headers.
+ * Origins configured via HEADLESS_ALLOWED_ORIGINS in wp-config.php
+ * or the 'headless_pro_allowed_origins' filter.
  */
 class HeadlessProCORS
 {
 
     public function __construct()
     {
-        add_action('rest_api_init', array($this, 'add_cors_headers'));
+        add_action('init', array($this, 'handle_cors'), 1);
     }
 
-    public function add_cors_headers()
+    public function handle_cors()
     {
+        $origin = $this->get_request_origin();
         $allowed_origins = $this->get_allowed_origins();
-        $origin = get_http_origin();
 
-        if (in_array($origin, $allowed_origins)) {
+        if ($origin && in_array($origin, $allowed_origins, true)) {
             header('Access-Control-Allow-Origin: ' . $origin);
+            header('Access-Control-Allow-Credentials: true');
+            header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
+            header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, Origin, Accept, Cache-Control');
         }
 
-        header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With');
-
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             status_header(200);
             exit();
         }
     }
 
+    private function get_request_origin()
+    {
+        if (function_exists('get_http_origin')) {
+            return get_http_origin();
+        }
+        return isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+    }
+
     private function get_allowed_origins()
     {
-        // Add your frontend domains here
-        $origins = array(
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'https://edrishusein.com',
-            'https://www.edrishusein.com',
-            'https://magical-swirles.82-165-132-190.plesk.page',
-            'http://82.165.132.190',
-            'https://82.165.132.190',
-        );
-
-        return apply_filters('headless_pro_allowed_origins', $origins);
+        return apply_filters('headless_pro_allowed_origins', HeadlessProConfig::get_allowed_origins());
     }
 }
 new HeadlessProCORS();

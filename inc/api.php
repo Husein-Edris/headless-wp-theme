@@ -8,7 +8,7 @@
 
 if (!defined('ABSPATH')) {
     exit;
-}
+} 
 
 class HeadlessProAPI
 {
@@ -19,7 +19,6 @@ class HeadlessProAPI
         add_action('rest_api_init', array($this, 'modify_default_endpoints'));
         add_filter('rest_prepare_post', array($this, 'add_custom_post_fields'), 10, 3);
         add_filter('rest_prepare_page', array($this, 'add_custom_page_fields'), 10, 3);
-        add_action('init', array($this, 'add_cors_headers'));
     }
 
     /**
@@ -442,7 +441,7 @@ class HeadlessProAPI
         ));
 
         // Add custom fields to custom post types
-        $custom_post_types = array('project', 'skill', 'hobby');
+        $custom_post_types = array('project', 'skill', 'hobby', 'tech');
         foreach ($custom_post_types as $post_type) {
             if (post_type_exists($post_type)) {
                 register_rest_field($post_type, 'acf_fields', array(
@@ -467,29 +466,6 @@ class HeadlessProAPI
 
         $fields = get_fields($object['id']);
         return $fields ?: array();
-    }
-
-    /**
-     * Add CORS headers for API requests
-     */
-    public function add_cors_headers()
-    {
-        if (defined('REST_REQUEST') && REST_REQUEST) {
-            $origin = get_http_origin();
-            $allowed_origins = apply_filters('headless_pro_allowed_origins', array(
-                'http://localhost:3000',
-                'http://localhost:3001',
-                'https://edrishusein.com',
-            ));
-
-            if (in_array($origin, $allowed_origins)) {
-                header('Access-Control-Allow-Origin: ' . $origin);
-            }
-
-            header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
-            header('Access-Control-Allow-Credentials: true');
-            header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With');
-        }
     }
 
     /**
