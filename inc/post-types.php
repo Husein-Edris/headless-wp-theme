@@ -31,6 +31,7 @@ class HeadlessProPostTypes
         $this->register_hobbies_cpt();
         $this->register_projects_cpt();
         $this->register_tech_cpt();
+        $this->register_books_cpt();
     }
 
     /**
@@ -174,6 +175,40 @@ class HeadlessProPostTypes
             'has_archive' => true,
             'rewrite' => array('slug' => 'technologies'),
             'menu_position' => 23,
+        ));
+    }
+
+    /**
+     * Register Bookshelf Custom Post Type
+     */
+    private function register_books_cpt()
+    {
+        register_post_type('book', array(
+            'labels' => array(
+                'name' => 'Bookshelf',
+                'singular_name' => 'Book',
+                'add_new' => 'Add New Book',
+                'add_new_item' => 'Add New Book',
+                'edit_item' => 'Edit Book',
+                'new_item' => 'New Book',
+                'view_item' => 'View Book',
+                'search_items' => 'Search in Bookshelf',
+                'not_found' => 'No Books found',
+                'not_found_in_trash' => 'No Book found in Trash',
+                'all_items' => 'All Books',
+                'archives' => 'Books Archives',
+                'menu_name' => 'Bookshelf',
+            ),
+            'public' => true,
+            'show_in_rest' => true,
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'book',
+            'graphql_plural_name' => 'books',
+            'menu_icon' => 'dashicons-book',
+            'supports' => array('title', 'excerpt', 'thumbnail', 'custom-fields'),
+            'taxonomies' => array('category'),
+            'has_archive' => false,
+            'menu_position' => 24,
         ));
     }
 

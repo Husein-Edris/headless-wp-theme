@@ -441,7 +441,7 @@ class HeadlessProAPI
         ));
 
         // Add custom fields to custom post types
-        $custom_post_types = array('project', 'skill', 'hobby', 'tech');
+        $custom_post_types = array('project', 'skill', 'hobby', 'tech', 'book');
         foreach ($custom_post_types as $post_type) {
             if (post_type_exists($post_type)) {
                 register_rest_field($post_type, 'acf_fields', array(
