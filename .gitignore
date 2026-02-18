@@ -98,3 +98,4 @@ coverage/
 .vitest-cache/
 .nyc_output/
 *.lcov
+tests/wp-tests-config.php.example
