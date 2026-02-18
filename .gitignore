@@ -73,3 +73,28 @@ CLAUDE.md
 CHANGELOG.md
 TROUBLESHOOTING.md
 ACF-MIGRATION-PLAN.md
+
+# ============================================
+# Spec-Driven Development
+# ============================================
+.specify/
+specs/
+
+# ============================================
+# Documentation (Local Only)
+# ============================================
+docs/
+docs_backup_*/
+TODO.md
+
+# ============================================
+# Testing
+# ============================================
+tests/wp-tests-config.php
+.phpunit.result.cache
+patchwork.json
+coverage/
+.vitest/
+.vitest-cache/
+.nyc_output/
+*.lcov
