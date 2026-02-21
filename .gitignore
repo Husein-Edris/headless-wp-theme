@@ -59,6 +59,7 @@ Thumbs.db
 # Plugin testing
 /vendor/
 composer.lock
+.phpunit.result.cache
 
 # Database dumps
 *.sql
@@ -73,3 +74,8 @@ CLAUDE.md
 CHANGELOG.md
 TROUBLESHOOTING.md
 ACF-MIGRATION-PLAN.md
+
+
+# Specs Files
+specs/
+.specify/
