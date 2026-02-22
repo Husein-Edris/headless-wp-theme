@@ -296,32 +296,3 @@ function headless_pro_cleanup()
 }
 add_action('admin_menu', 'headless_pro_cleanup', 999);
 
-/**
- * Add helpful admin notices
- */
-function headless_pro_admin_notices()
-{
-    $screen = get_current_screen();
-
-    if ($screen->id === 'dashboard') {
-        echo '<div class="notice notice-info">
-            <p><strong>Headless Pro Theme Active:</strong> Your WordPress backend is optimized for headless/JAMstack applications. 
-            <a href="' . home_url() . '" target="_blank">View frontend status</a></p>
-        </div>';
-    }
-}
-add_action('admin_notices', 'headless_pro_admin_notices');
-
-/**
- * Enqueue admin styles
- */
-function headless_pro_admin_styles()
-{
-    wp_enqueue_style(
-        'headless-pro-admin',
-        HEADLESS_THEME_URL . '/assets/admin.css',
-        array(),
-        HEADLESS_THEME_VERSION
-    );
-}
-add_action('admin_enqueue_scripts', 'headless_pro_admin_styles');
