@@ -14,10 +14,10 @@ A WordPress theme designed for headless/JAMstack use. All frontend visitors are 
 - [Advanced Custom Fields PRO](https://www.advancedcustomfields.com/) — Custom field management
 - [WPGraphQL for ACF](https://acf.wpgraphql.com/) — Exposes ACF fields in GraphQL
 
-## Installation
+## Setup
 
-1. Upload to `/wp-content/themes/headless-wp-theme/`
-2. Activate in WordPress admin
+1. Clone the repository into `/wp-content/themes/headless-wp-theme/`
+2. Activate the theme in **Appearance > Themes**
 3. Install and activate the required plugins listed above
 4. Set permalinks to "Post name" under **Settings > Permalinks**
 
