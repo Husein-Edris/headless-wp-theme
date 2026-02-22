@@ -20,6 +20,15 @@ acf_add_local_field_group(array(
     'title' => 'Homepage Content',
     'fields' => array(
 
+        // --- Hero Tab ---
+        array(
+            'key' => 'field_tab_hero',
+            'label' => 'Hero',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
+        ),
+
         // --- Hero Section ---
         array(
             'key' => 'field_67b9e23fddea0',
@@ -53,6 +62,15 @@ acf_add_local_field_group(array(
             ),
         ),
 
+        // --- Projects Tab ---
+        array(
+            'key' => 'field_tab_projects',
+            'label' => 'Projects',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
+        ),
+
         // --- Projects Section ---
         array(
             'key' => 'field_projects_section',
@@ -74,6 +92,15 @@ acf_add_local_field_group(array(
                     'default_value' => 'Projects',
                 ),
             ),
+        ),
+
+        // --- About Me Tab ---
+        array(
+            'key' => 'field_tab_about_me',
+            'label' => 'About Me',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
         ),
 
         // --- About Me Section ---
@@ -108,6 +135,15 @@ acf_add_local_field_group(array(
                     'graphql_field_name' => 'aboutMeText',
                 ),
             ),
+        ),
+
+        // --- Bookshelf Tab ---
+        array(
+            'key' => 'field_tab_bookshelf',
+            'label' => 'Bookshelf',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
         ),
 
         // --- Bookshelf Section ---
@@ -153,6 +189,15 @@ acf_add_local_field_group(array(
             ),
         ),
 
+        // --- Tech Stack Tab ---
+        array(
+            'key' => 'field_tab_techstack',
+            'label' => 'Tech Stack',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
+        ),
+
         // --- Tech Stack Section ---
         array(
             'key' => 'field_techstack_section',
@@ -195,6 +240,15 @@ acf_add_local_field_group(array(
             ),
         ),
 
+        // --- Notebook Tab ---
+        array(
+            'key' => 'field_tab_notebook',
+            'label' => 'Notebook',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
+        ),
+
         // --- Notebook Section ---
         array(
             'key' => 'field_67b9e47314360',
@@ -218,6 +272,15 @@ acf_add_local_field_group(array(
                     'show_in_graphql' => 1,
                 ),
             ),
+        ),
+
+        // --- Contact Tab ---
+        array(
+            'key' => 'field_tab_contact',
+            'label' => 'Contact',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
         ),
 
         // --- Contact Section ---

@@ -4,7 +4,7 @@
  * ACF Fields: About Page Fields
  *
  * GraphQL field name: aboutPageFields
- * Location: About page (matched by slug 'about-me' via headless_pro_get_page_id_by_slug())
+ * Location: About page (matched by slug 'about-me' or 'about' via slug-based location matcher)
  *
  * Sections: Hero, Experience (repeater with tech relationships), Skills, Personal, Hobbies
  *
@@ -13,6 +13,49 @@
 
 if (!defined('ABSPATH')) {
     exit;
+}
+
+$location_rules = array(
+    // Slug-based matching (portable across environments).
+    array(
+        array(
+            'param' => 'page',
+            'operator' => '==',
+            'value' => 'slug:about-me',
+        ),
+    ),
+    array(
+        array(
+            'param' => 'page',
+            'operator' => '==',
+            'value' => 'slug:about',
+        ),
+    ),
+);
+
+// Fallback: resolve page IDs at runtime so location matching remains portable.
+if (function_exists('headless_pro_get_page_id_by_slug')) {
+    $about_me_id = headless_pro_get_page_id_by_slug('about-me');
+    if ($about_me_id > 0) {
+        $location_rules[] = array(
+            array(
+                'param' => 'page',
+                'operator' => '==',
+                'value' => (string) $about_me_id,
+            ),
+        );
+    }
+
+    $about_id = headless_pro_get_page_id_by_slug('about');
+    if ($about_id > 0) {
+        $location_rules[] = array(
+            array(
+                'param' => 'page',
+                'operator' => '==',
+                'value' => (string) $about_id,
+            ),
+        );
+    }
 }
 
 acf_add_local_field_group(array(
@@ -83,7 +126,7 @@ acf_add_local_field_group(array(
             'max' => 0,
             'layout' => 'block',
             'button_label' => 'Add Experience',
-            'rows_per_page' => 20,
+            'rows_per_page' => 10,
             'sub_fields' => array(
                 array(
                     'key' => 'field_64a1b2c3d4e71',
@@ -120,7 +163,7 @@ acf_add_local_field_group(array(
                     'tabs' => 'all',
                     'toolbar' => 'full',
                     'media_upload' => 1,
-                    'delay' => 0,
+                    'delay' => 1,
                     'show_in_graphql' => 1,
                     'graphql_field_name' => 'description',
                     'parent_repeater' => 'field_64a1b2c3d4e70',
@@ -131,7 +174,7 @@ acf_add_local_field_group(array(
                     'name' => 'technologies',
                     'type' => 'post_object',
                     'post_type' => array('tech'),
-                    'return_format' => 'object',
+                    'return_format' => 'id',
                     'multiple' => 1,
                     'allow_null' => 0,
                     'ui' => 1,
@@ -223,15 +266,7 @@ acf_add_local_field_group(array(
         ),
 
     ),
-    'location' => array(
-        array(
-            array(
-                'param' => 'page',
-                'operator' => '==',
-                'value' => (string) headless_pro_get_page_id_by_slug('about-me'),
-            ),
-        ),
-    ),
+    'location' => $location_rules,
     'menu_order' => 0,
     'position' => 'normal',
     'style' => 'seamless',

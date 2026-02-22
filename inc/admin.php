@@ -22,6 +22,35 @@ class HeadlessProAdmin
         add_action('admin_bar_menu', array($this, 'add_admin_bar_links'), 100);
         add_action('wp_dashboard_setup', array($this, 'add_dashboard_widgets'));
         add_action('admin_notices', array($this, 'show_headless_notices'));
+        add_action('admin_post_headless_pro_set_acf_admin_visibility', array($this, 'handle_set_acf_admin_visibility'));
+    }
+
+    private function get_acf_admin_visibility_mode(): string
+    {
+        $mode = get_option('headless_pro_acf_admin_visibility', 'auto');
+        $mode = is_string($mode) ? $mode : 'auto';
+        $mode = strtolower(trim($mode));
+        return in_array($mode, array('auto', 'show', 'hide'), true) ? $mode : 'auto';
+    }
+
+    public function handle_set_acf_admin_visibility(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Insufficient permissions.');
+        }
+
+        check_admin_referer('headless_pro_set_acf_admin_visibility');
+
+        $mode = isset($_POST['acf_admin_visibility']) ? (string) $_POST['acf_admin_visibility'] : 'auto';
+        $mode = strtolower(trim($mode));
+        if (!in_array($mode, array('auto', 'show', 'hide'), true)) {
+            $mode = 'auto';
+        }
+
+        update_option('headless_pro_acf_admin_visibility', $mode, false);
+
+        wp_safe_redirect(admin_url('admin.php?page=headless-pro&acf_admin_updated=1'));
+        exit;
     }
 
     /**
@@ -277,9 +306,16 @@ class HeadlessProAdmin
         $config       = $this->get_cors_config();
         $rest_health  = $this->check_rest_api_health();
         $gql_health   = $this->check_graphql_health();
+        $acf_mode     = $this->get_acf_admin_visibility_mode();
         ?>
 <div class="wrap">
     <h1><span class="dashicons dashicons-rest-api"></span> Headless Pro Settings</h1>
+
+    <?php if (!empty($_GET['acf_admin_updated'])) : ?>
+        <div class="notice notice-success is-dismissible">
+            <p><strong>Headless Pro:</strong> ACF Admin visibility updated.</p>
+        </div>
+    <?php endif; ?>
 
     <div class="headless-admin-grid">
         <div class="headless-card">
@@ -311,6 +347,33 @@ class HeadlessProAdmin
                 <strong>ACF Admin:</strong>
                 <?php echo $config['acf_admin_visible'] ? 'Visible' : 'Hidden'; ?>
             </p>
+
+            <hr style="margin: 14px 0;" />
+
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field('headless_pro_set_acf_admin_visibility'); ?>
+                <input type="hidden" name="action" value="headless_pro_set_acf_admin_visibility" />
+
+                <p style="margin: 0 0 6px;"><strong>ACF Admin UI</strong></p>
+                <label style="display:block; margin: 0 0 6px;">
+                    <input type="radio" name="acf_admin_visibility" value="auto" <?php checked($acf_mode, 'auto'); ?> />
+                    Auto (hide in production/staging)
+                </label>
+                <label style="display:block; margin: 0 0 6px;">
+                    <input type="radio" name="acf_admin_visibility" value="show" <?php checked($acf_mode, 'show'); ?> />
+                    Force show
+                </label>
+                <label style="display:block; margin: 0 0 10px;">
+                    <input type="radio" name="acf_admin_visibility" value="hide" <?php checked($acf_mode, 'hide'); ?> />
+                    Force hide
+                </label>
+
+                <p class="description" style="margin:0 0 10px;">
+                    This controls access to ACF Field Groups in wp-admin. Use with care on production sites.
+                </p>
+
+                <button type="submit" class="button">Save</button>
+            </form>
         </div>
     </div>
 
