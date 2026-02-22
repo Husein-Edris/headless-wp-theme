@@ -51,6 +51,14 @@ class HeadlessProACFFields
         add_action('add_meta_boxes', array($this, 'maybe_add_forced_about_fields_metabox'), 100, 2);
     }
 
+    private function get_acf_admin_visibility_mode(): string
+    {
+        $mode = get_option('headless_pro_acf_admin_visibility', 'auto');
+        $mode = is_string($mode) ? $mode : 'auto';
+        $mode = strtolower(trim($mode));
+        return in_array($mode, array('auto', 'show', 'hide'), true) ? $mode : 'auto';
+    }
+
     /**
      * US3: Hide ACF field group editor in production and staging.
      *
@@ -59,6 +67,14 @@ class HeadlessProACFFields
      */
     public function maybe_hide_admin($show)
     {
+        $mode = $this->get_acf_admin_visibility_mode();
+        if ($mode === 'show') {
+            return true;
+        }
+        if ($mode === 'hide') {
+            return false;
+        }
+
         $env = wp_get_environment_type();
         if ($env === 'production' || $env === 'staging') {
             return false;
