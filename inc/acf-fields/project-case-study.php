@@ -6,7 +6,7 @@
  * GraphQL field name: caseStudy
  * Post type: project
  *
- * Groups: Overview (tech relationship), Content (challenge/solution), Gallery, Links
+ * Groups: Overview (tech relationship), Content (challenge/solution), Key Features (repeater), Gallery, Links
  *
  * @package HeadlessPro
  */
@@ -76,6 +76,39 @@ acf_add_local_field_group(array(
                     'toolbar' => 'full',
                     'media_upload' => 1,
                     'delay' => 0,
+                    'show_in_graphql' => 1,
+                ),
+            ),
+        ),
+
+        // --- Key Features (repeater) ---
+        array(
+            'key' => 'field_key_features',
+            'label' => 'Key Features',
+            'name' => 'key_features',
+            'type' => 'repeater',
+            'instructions' => 'Highlight the key features of this project',
+            'layout' => 'block',
+            'min' => 0,
+            'max' => 0,
+            'button_label' => 'Add Feature',
+            'show_in_graphql' => 1,
+            'sub_fields' => array(
+                array(
+                    'key' => 'field_feature_title',
+                    'label' => 'Title',
+                    'name' => 'title',
+                    'type' => 'text',
+                    'required' => 1,
+                    'show_in_graphql' => 1,
+                ),
+                array(
+                    'key' => 'field_feature_description',
+                    'label' => 'Description',
+                    'name' => 'description',
+                    'type' => 'textarea',
+                    'rows' => 3,
+                    'required' => 0,
                     'show_in_graphql' => 1,
                 ),
             ),
