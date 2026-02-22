@@ -31,6 +31,7 @@ class HeadlessProPostTypes
         $this->register_hobbies_cpt();
         $this->register_projects_cpt();
         $this->register_tech_cpt();
+        $this->register_books_cpt();
     }
 
     /**
@@ -171,9 +172,68 @@ class HeadlessProPostTypes
             'graphql_plural_name' => 'techs',
             'menu_icon' => 'dashicons-code-standards',
             'supports' => array('title', 'editor', 'thumbnail', 'excerpt'),
+            'taxonomies' => array('tech_category'),
             'has_archive' => true,
             'rewrite' => array('slug' => 'technologies'),
             'menu_position' => 23,
+        ));
+
+        register_taxonomy('tech_category', 'tech', array(
+            'labels' => array(
+                'name' => 'Tech Categories',
+                'singular_name' => 'Tech Category',
+                'search_items' => 'Search Tech Categories',
+                'all_items' => 'All Tech Categories',
+                'parent_item' => 'Parent Tech Category',
+                'parent_item_colon' => 'Parent Tech Category:',
+                'edit_item' => 'Edit Tech Category',
+                'update_item' => 'Update Tech Category',
+                'add_new_item' => 'Add New Tech Category',
+                'new_item_name' => 'New Tech Category Name',
+                'menu_name' => 'Tech Categories',
+            ),
+            'hierarchical' => true,
+            'public' => true,
+            'show_in_rest' => true,
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'techCategory',
+            'graphql_plural_name' => 'techCategories',
+            'rewrite' => array('slug' => 'tech-category'),
+            'show_admin_column' => true,
+        ));
+    }
+
+    /**
+     * Register Bookshelf Custom Post Type
+     */
+    private function register_books_cpt()
+    {
+        register_post_type('book', array(
+            'labels' => array(
+                'name' => 'Bookshelf',
+                'singular_name' => 'Book',
+                'add_new' => 'Add New Book',
+                'add_new_item' => 'Add New Book',
+                'edit_item' => 'Edit Book',
+                'new_item' => 'New Book',
+                'view_item' => 'View Book',
+                'search_items' => 'Search in Bookshelf',
+                'not_found' => 'No Books found',
+                'not_found_in_trash' => 'No Book found in Trash',
+                'all_items' => 'All Books',
+                'archives' => 'Books Archives',
+                'menu_name' => 'Bookshelf',
+            ),
+            'public' => true,
+            'show_in_rest' => true,
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'book',
+            'graphql_plural_name' => 'books',
+            'menu_icon' => 'dashicons-book',
+            'supports' => array('title', 'excerpt', 'thumbnail', 'custom-fields'),
+            'taxonomies' => array('category'),
+            'has_archive' => false,
+            'menu_position' => 24,
         ));
     }
 
