@@ -50,6 +50,18 @@ class HeadlessProConfig
         return 'https://edrishusein.com';
     }
 
+    public static function get_frontend_url_source(): string
+    {
+        if (defined('HEADLESS_FRONTEND_URL') && trim((string) HEADLESS_FRONTEND_URL) !== '') {
+            return 'wp-config';
+        }
+        $opt = get_option('headless_pro_frontend_url', '');
+        if (is_string($opt) && trim($opt) !== '') {
+            return 'option';
+        }
+        return 'default';
+    }
+
     public static function get_allowed_origins()
     {
         if (defined('HEADLESS_ALLOWED_ORIGINS') && !empty(HEADLESS_ALLOWED_ORIGINS)) {
@@ -60,6 +72,18 @@ class HeadlessProConfig
             return self::parse_list($opt);
         }
         return self::$default_origins;
+    }
+
+    public static function get_allowed_origins_source(): string
+    {
+        if (defined('HEADLESS_ALLOWED_ORIGINS') && trim((string) HEADLESS_ALLOWED_ORIGINS) !== '') {
+            return 'wp-config';
+        }
+        $opt = get_option('headless_pro_allowed_origins', '');
+        if (is_string($opt) && trim($opt) !== '') {
+            return 'option';
+        }
+        return 'default';
     }
 
     public static function get_frontend_redirect_mode(): string
@@ -265,20 +289,35 @@ class HeadlessProCORS
     {
         $origin = $this->get_request_origin();
         $allowed_origins = $this->get_allowed_origins();
+        $cors_debug = HeadlessProConfig::is_cors_debug_enabled();
 
         if ($origin && in_array($origin, $allowed_origins, true)) {
             header('Access-Control-Allow-Origin: ' . $origin);
             header('Access-Control-Allow-Credentials: true');
             header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
             header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, Origin, Accept, Cache-Control');
-            if (HeadlessProConfig::is_cors_debug_enabled() || (defined('WP_DEBUG') && WP_DEBUG)) {
+            if ($cors_debug || (defined('WP_DEBUG') && WP_DEBUG)) {
                 header('X-HeadlessPro-CORS: allowed');
                 header('X-HeadlessPro-Origin: ' . $origin);
+            }
+            if ($cors_debug && $origin) {
+                set_transient('headless_pro_last_cors_origin', array(
+                    'origin'  => $origin,
+                    'allowed' => true,
+                    'time'    => time(),
+                ), DAY_IN_SECONDS);
             }
         } elseif (HeadlessProConfig::is_cors_debug_enabled() || (defined('WP_DEBUG') && WP_DEBUG)) {
             header('X-HeadlessPro-CORS: blocked');
             if ($origin) {
                 header('X-HeadlessPro-Origin: ' . $origin);
+            }
+            if ($cors_debug && $origin) {
+                set_transient('headless_pro_last_cors_origin', array(
+                    'origin'  => $origin,
+                    'allowed' => false,
+                    'time'    => time(),
+                ), DAY_IN_SECONDS);
             }
         }
 

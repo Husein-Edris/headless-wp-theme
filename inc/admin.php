@@ -24,6 +24,7 @@ class HeadlessProAdmin
         add_action('admin_notices', array($this, 'show_headless_notices'));
         add_action('admin_post_headless_pro_set_acf_admin_visibility', array($this, 'handle_set_acf_admin_visibility'));
         add_action('admin_post_headless_pro_save_headless_settings', array($this, 'handle_save_headless_settings'));
+        add_action('admin_post_headless_pro_save_frontend_url', array($this, 'handle_save_frontend_url'));
     }
 
     private function get_acf_admin_visibility_mode(): string
@@ -54,6 +55,23 @@ class HeadlessProAdmin
         exit;
     }
 
+    public function handle_save_frontend_url(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Insufficient permissions.');
+        }
+
+        check_admin_referer('headless_pro_save_frontend_url');
+
+        $frontend_url = isset($_POST['frontend_url']) ? esc_url_raw(wp_unslash((string) $_POST['frontend_url'])) : '';
+        $frontend_url = is_string($frontend_url) ? rtrim(trim($frontend_url), '/') : '';
+
+        update_option('headless_pro_frontend_url', $frontend_url, false);
+
+        wp_safe_redirect(admin_url('admin.php?page=headless-pro&frontend_url_updated=1#headless-pro-configuration'));
+        exit;
+    }
+
     private function sanitize_textarea_list(string $raw): string
     {
         $raw = wp_unslash($raw);
@@ -78,9 +96,6 @@ class HeadlessProAdmin
 
         check_admin_referer('headless_pro_save_headless_settings');
 
-        $frontend_url = isset($_POST['frontend_url']) ? esc_url_raw(wp_unslash((string) $_POST['frontend_url'])) : '';
-        $frontend_url = is_string($frontend_url) ? rtrim(trim($frontend_url), '/') : '';
-
         $redirect_mode = isset($_POST['redirect_mode']) ? strtolower(trim((string) $_POST['redirect_mode'])) : 'always';
         if (!in_array($redirect_mode, array('always', 'prod_staging', 'off'), true)) {
             $redirect_mode = 'always';
@@ -96,7 +111,6 @@ class HeadlessProAdmin
 
         $cors_debug = !empty($_POST['cors_debug']) ? 1 : 0;
 
-        update_option('headless_pro_frontend_url', $frontend_url, false);
         update_option('headless_pro_redirect_mode', $redirect_mode, false);
         update_option('headless_pro_redirect_allowlist', $redirect_allowlist, false);
         update_option('headless_pro_allowed_origins', $allowed_origins, false);
@@ -386,6 +400,12 @@ class HeadlessProAdmin
         </div>
     <?php endif; ?>
 
+    <?php if (!empty($_GET['frontend_url_updated'])) : ?>
+        <div class="notice notice-success is-dismissible">
+            <p><strong>Headless Pro:</strong> Frontend URL updated.</p>
+        </div>
+    <?php endif; ?>
+
     <div class="headless-admin-grid">
         <div class="headless-card">
             <h2><span class="dashicons dashicons-chart-pie"></span> API Status</h2>
@@ -449,9 +469,9 @@ class HeadlessProAdmin
 
             <hr style="margin: 14px 0;" />
 
-            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                <?php wp_nonce_field('headless_pro_save_headless_settings'); ?>
-                <input type="hidden" name="action" value="headless_pro_save_headless_settings" />
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin-bottom: 16px;">
+                <?php wp_nonce_field('headless_pro_save_frontend_url'); ?>
+                <input type="hidden" name="action" value="headless_pro_save_frontend_url" />
 
                 <p style="margin: 0 0 6px;"><strong>Frontend URL override</strong></p>
                 <input
@@ -464,6 +484,13 @@ class HeadlessProAdmin
                 <p class="description" style="margin:6px 0 12px;">
                     If <code>HEADLESS_FRONTEND_URL</code> is defined in <code>wp-config.php</code>, it will override this value.
                 </p>
+
+                <button type="submit" class="button button-primary">Save Frontend URL</button>
+            </form>
+
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field('headless_pro_save_headless_settings'); ?>
+                <input type="hidden" name="action" value="headless_pro_save_headless_settings" />
 
                 <p style="margin: 0 0 6px;"><strong>Frontend redirect mode</strong></p>
                 <label style="display:block; margin: 0 0 6px;">
@@ -563,6 +590,9 @@ class HeadlessProAdmin
         $redirect_mode  = HeadlessProConfig::get_frontend_redirect_mode();
         $allowlist      = HeadlessProConfig::get_frontend_redirect_allowlist();
         $cors_debug_on  = HeadlessProConfig::is_cors_debug_enabled();
+        $frontend_source = HeadlessProConfig::get_frontend_url_source();
+        $origins_source  = HeadlessProConfig::get_allowed_origins_source();
+        $last_cors = $cors_debug_on ? get_transient('headless_pro_last_cors_origin') : null;
         ?>
 <div class="wrap">
     <h1><span class="dashicons dashicons-chart-pie"></span> API Status</h1>
@@ -685,6 +715,30 @@ echo esc_html(
             <li><strong>Redirect allowlist entries:</strong> <code><?php echo esc_html((string) count($allowlist)); ?></code></li>
             <li><strong>CORS debug headers:</strong> <code><?php echo $cors_debug_on ? 'on' : 'off'; ?></code></li>
         </ul>
+
+        <hr style="margin: 14px 0;" />
+
+        <p style="margin: 0 0 6px;"><strong>Diagnostics (config source)</strong></p>
+        <ul style="margin: 0 0 0 18px; list-style: disc;">
+            <li><strong>Frontend URL source:</strong> <code><?php echo esc_html($frontend_source); ?></code></li>
+            <li><strong>Allowed origins source:</strong> <code><?php echo esc_html($origins_source); ?></code></li>
+        </ul>
+
+        <?php if ($cors_debug_on) : ?>
+            <p style="margin: 12px 0 6px;"><strong>Last CORS request seen</strong></p>
+            <?php if (is_array($last_cors) && !empty($last_cors['origin'])) : ?>
+                <ul style="margin: 0 0 0 18px; list-style: disc;">
+                    <li><strong>Origin:</strong> <code><?php echo esc_html((string) $last_cors['origin']); ?></code></li>
+                    <li><strong>Allowed:</strong> <code><?php echo !empty($last_cors['allowed']) ? 'yes' : 'no'; ?></code></li>
+                    <li><strong>Time:</strong> <code><?php echo esc_html(gmdate('Y-m-d H:i:s', (int) ($last_cors['time'] ?? 0)) . ' UTC'); ?></code></li>
+                </ul>
+                <p class="description" style="margin: 6px 0 0;">
+                    This updates only when “CORS debug headers” is enabled.
+                </p>
+            <?php else : ?>
+                <p class="description" style="margin: 0;">No CORS requests recorded yet.</p>
+            <?php endif; ?>
+        <?php endif; ?>
     </div>
 </div>
 
