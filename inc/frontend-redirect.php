@@ -22,25 +22,22 @@ function redirect_frontend_to_main_site() {
         return;
     }
 
-    // Don't redirect API endpoints (REST API, GraphQL, etc.)
     $request_uri = $_SERVER['REQUEST_URI'] ?? '';
 
-    // Preserve these endpoints
-    $api_patterns = [
-        '/wp-json/',           // REST API
-        '/graphql',            // GraphQL endpoint
-        '/wp-admin/',          // Admin area
-        '/wp-login.php',       // Login page
-        '/wp-content/',        // Assets (images, CSS, JS)
-        '/wp-includes/',       // WordPress core files
-        '/.well-known/',       // SSL verification, etc.
-        '/xmlrpc.php',         // XML-RPC (if needed)
-        '/feed/',              // RSS feeds
-        '/sitemap',            // Sitemaps
-    ];
+    // Optional redirect mode.
+    $mode = HeadlessProConfig::get_frontend_redirect_mode();
+    if ($mode === 'off') {
+        return;
+    }
+    if ($mode === 'prod_staging') {
+        $env = wp_get_environment_type();
+        if ($env !== 'production' && $env !== 'staging') {
+            return;
+        }
+    }
 
-    // Check if current request matches any API pattern
-    foreach ($api_patterns as $pattern) {
+    // Preserve these endpoints (allowlist).
+    foreach (HeadlessProConfig::get_frontend_redirect_allowlist() as $pattern) {
         if (strpos($request_uri, $pattern) !== false) {
             return; // Don't redirect API endpoints
         }
@@ -56,8 +53,16 @@ function redirect_frontend_to_main_site() {
         return;
     }
 
-    // Redirect all other frontend requests to main site
-    wp_redirect(HeadlessProConfig::get_frontend_url(), 301);
+    $frontend = HeadlessProConfig::get_frontend_url();
+    $frontend_host = wp_parse_url($frontend, PHP_URL_HOST);
+    $current_host = $_SERVER['HTTP_HOST'] ?? '';
+    if ($frontend_host && $current_host && $frontend_host === $current_host) {
+        return;
+    }
+
+    // Redirect all other frontend requests to main site (preserve path/query).
+    $target = rtrim($frontend, '/') . (strpos($request_uri, '/') === 0 ? $request_uri : '/' . $request_uri);
+    wp_redirect($target, 301);
     exit;
 }
 
