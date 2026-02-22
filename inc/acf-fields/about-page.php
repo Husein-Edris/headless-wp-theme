@@ -4,7 +4,7 @@
  * ACF Fields: About Page Fields
  *
  * GraphQL field name: aboutPageFields
- * Location: About page (ID 199 — update if page ID differs per environment)
+ * Location: About page (matched by slug 'about-me' via headless_pro_get_page_id_by_slug())
  *
  * Sections: Hero, Experience (repeater with tech relationships), Skills, Personal, Hobbies
  *
@@ -228,7 +228,7 @@ acf_add_local_field_group(array(
             array(
                 'param' => 'page',
                 'operator' => '==',
-                'value' => '199', // About page ID — update per environment
+                'value' => (string) headless_pro_get_page_id_by_slug('about-me'),
             ),
         ),
     ),
