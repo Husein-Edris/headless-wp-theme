@@ -43,6 +43,10 @@ class HeadlessProConfig
         if (defined('HEADLESS_FRONTEND_URL')) {
             return rtrim(HEADLESS_FRONTEND_URL, '/');
         }
+        $opt = get_option('headless_pro_frontend_url', '');
+        if (is_string($opt) && trim($opt) !== '') {
+            return rtrim(trim($opt), '/');
+        }
         return 'https://edrishusein.com';
     }
 
@@ -51,7 +55,63 @@ class HeadlessProConfig
         if (defined('HEADLESS_ALLOWED_ORIGINS') && !empty(HEADLESS_ALLOWED_ORIGINS)) {
             return array_map('trim', explode(',', HEADLESS_ALLOWED_ORIGINS));
         }
+        $opt = get_option('headless_pro_allowed_origins', '');
+        if (is_string($opt) && trim($opt) !== '') {
+            return self::parse_list($opt);
+        }
         return self::$default_origins;
+    }
+
+    public static function get_frontend_redirect_mode(): string
+    {
+        $mode = get_option('headless_pro_redirect_mode', 'always');
+        $mode = is_string($mode) ? strtolower(trim($mode)) : 'always';
+        return in_array($mode, array('always', 'prod_staging', 'off'), true) ? $mode : 'always';
+    }
+
+    public static function get_default_frontend_redirect_allowlist(): array
+    {
+        return array(
+            '/wp-json/',           // REST API
+            '/graphql',            // GraphQL endpoint
+            '/wp-admin/',          // Admin area
+            '/wp-login.php',       // Login page
+            '/wp-content/',        // Assets (images, CSS, JS)
+            '/wp-includes/',       // WordPress core files
+            '/.well-known/',       // SSL verification, etc.
+            '/xmlrpc.php',         // XML-RPC (if needed)
+            '/feed/',              // RSS feeds
+            '/sitemap',            // Sitemaps
+        );
+    }
+
+    public static function get_frontend_redirect_allowlist(): array
+    {
+        $opt = get_option('headless_pro_redirect_allowlist', '');
+        if (is_string($opt) && trim($opt) !== '') {
+            return self::parse_list($opt);
+        }
+        return self::get_default_frontend_redirect_allowlist();
+    }
+
+    public static function is_cors_debug_enabled(): bool
+    {
+        return (bool) get_option('headless_pro_cors_debug', false);
+    }
+
+    private static function parse_list(string $raw): array
+    {
+        $raw = str_replace(array("\r\n", "\r"), "\n", $raw);
+        $parts = preg_split('/[,\n]+/', $raw) ?: array();
+        $items = array();
+        foreach ($parts as $p) {
+            $p = trim($p);
+            if ($p === '') {
+                continue;
+            }
+            $items[] = $p;
+        }
+        return array_values(array_unique($items));
     }
 }
 
@@ -211,6 +271,15 @@ class HeadlessProCORS
             header('Access-Control-Allow-Credentials: true');
             header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
             header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, Origin, Accept, Cache-Control');
+            if (HeadlessProConfig::is_cors_debug_enabled() || (defined('WP_DEBUG') && WP_DEBUG)) {
+                header('X-HeadlessPro-CORS: allowed');
+                header('X-HeadlessPro-Origin: ' . $origin);
+            }
+        } elseif (HeadlessProConfig::is_cors_debug_enabled() || (defined('WP_DEBUG') && WP_DEBUG)) {
+            header('X-HeadlessPro-CORS: blocked');
+            if ($origin) {
+                header('X-HeadlessPro-Origin: ' . $origin);
+            }
         }
 
         if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
