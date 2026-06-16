@@ -1,0 +1,28 @@
+/**
+ * Styles for drag-and-drop ordering on the Projects admin list.
+ *
+ * @package HeadlessPro
+ */
+
+.post-type-project .wp-list-table.posts #the-list tr {
+	cursor: move;
+}
+
+/* Don't let the drag affect the (non-draggable) check column hover. */
+.post-type-project .wp-list-table.posts #the-list tr .check-column {
+	cursor: default;
+}
+
+.hp-sort-placeholder {
+	outline: 2px dashed #2271b1;
+	background: #f0f6fc;
+}
+
+.hp-sort-placeholder td {
+	visibility: hidden;
+}
+
+#the-list.hp-reordering {
+	opacity: 0.6;
+	pointer-events: none;
+}

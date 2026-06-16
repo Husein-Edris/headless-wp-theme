@@ -351,6 +351,7 @@ function headless_pro_load_modules()
         'post-types.php',
         'acf-fields.php',
         'admin.php',
+        'project-order.php',
         'api.php',
         'frontend-redirect.php'
     );

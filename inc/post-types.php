@@ -135,7 +135,10 @@ class HeadlessProPostTypes
             'graphql_single_name' => 'project',
             'graphql_plural_name' => 'projects',
             'menu_icon' => 'dashicons-portfolio',
-            'supports' => array('title', 'editor', 'thumbnail', 'excerpt'),
+            // 'page-attributes' enables the native menu_order field, which the
+            // headless frontend uses to sort projects (drag-and-drop ordering is
+            // handled by HeadlessProProjectOrder in inc/project-order.php).
+            'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'page-attributes'),
             'has_archive' => true,
             'rewrite' => array('slug' => 'projects'),
             'menu_position' => 22,
