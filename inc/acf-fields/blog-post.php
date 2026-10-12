@@ -26,7 +26,7 @@ acf_add_local_field_group(array(
             'label' => 'Reading Time',
             'name' => 'reading_time',
             'type' => 'text',
-            'instructions' => 'Estimated reading time (e.g., \'5 min read\'). Leave empty for auto-calculation.',
+            'instructions' => 'Reading time in whole minutes, e.g. 5. Leave empty to compute it from the word count. A value more than 3x off the computed time is ignored.',
             'wrapper' => array('width' => '50', 'class' => '', 'id' => ''),
             'placeholder' => '5 min read',
             'show_in_graphql' => 1,
