@@ -132,6 +132,14 @@ acf_add_local_field_group(array(
             'default_value' => 'Experience',
         ),
         array(
+            'key' => 'field_about_experience_technologies_label',
+            'label' => 'Technologies label',
+            'name' => 'experience_technologies_label',
+            'type' => 'text',
+            'instructions' => 'Label before the technology list of each experience item. Leave empty to show: Technologies:',
+            'default_value' => 'Technologies:',
+        ),
+        array(
             'key' => 'field_64a1b2c3d4e70',
             'label' => 'Experience Items',
             'name' => 'experience_items',
@@ -267,6 +275,14 @@ acf_add_local_field_group(array(
             'return_format' => 'array',
             'preview_size' => 'medium',
             'library' => 'all',
+        ),
+        array(
+            'key' => 'field_about_hobbies_section_title',
+            'label' => 'Hobbies Section Title',
+            'name' => 'hobbies_section_title',
+            'type' => 'text',
+            'instructions' => 'Heading above the hobbies list. Leave empty to show: Interests & Hobbies',
+            'default_value' => 'Interests & Hobbies',
         ),
         array(
             'key' => 'field_64a1b2c3d4e83',

@@ -20,6 +20,10 @@ class HeadlessProPostTypes
         
         // Flush rewrite rules on theme activation
         add_action('after_switch_theme', array($this, 'flush_rewrite_rules'));
+
+        // Testimonials list: client name, company and a short quote excerpt.
+        add_filter('manage_testimonial_posts_columns', array($this, 'testimonial_columns'));
+        add_action('manage_testimonial_posts_custom_column', array($this, 'render_testimonial_column'), 10, 2);
     }
 
     /**
@@ -32,6 +36,7 @@ class HeadlessProPostTypes
         $this->register_projects_cpt();
         $this->register_tech_cpt();
         $this->register_books_cpt();
+        $this->register_testimonials_cpt();
     }
 
     /**
@@ -238,6 +243,86 @@ class HeadlessProPostTypes
             'has_archive' => false,
             'menu_position' => 24,
         ));
+    }
+
+    /**
+     * Register Testimonials Custom Post Type
+     *
+     * Not public (no single pages or archive), edited in WP admin and read by the
+     * headless frontend over REST. The Home page picks and orders the shown ones
+     * (ACF relationship in inc/acf-fields/testimonials.php). Title = client name.
+     */
+    private function register_testimonials_cpt()
+    {
+        register_post_type('testimonial', array(
+            'labels' => array(
+                'name' => 'Testimonials',
+                'singular_name' => 'Testimonial',
+                'add_new' => 'Add New',
+                'add_new_item' => 'Add New Testimonial',
+                'edit_item' => 'Edit Testimonial',
+                'new_item' => 'New Testimonial',
+                'view_item' => 'View Testimonial',
+                'search_items' => 'Search Testimonials',
+                'not_found' => 'No testimonials found',
+                'not_found_in_trash' => 'No testimonials found in Trash',
+                'all_items' => 'All Testimonials',
+                'enter_title_here' => 'Client name',
+            ),
+            'public' => false,
+            'publicly_queryable' => false,
+            'exclude_from_search' => true,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'show_in_nav_menus' => false,
+            'show_in_rest' => true,
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'testimonial',
+            'graphql_plural_name' => 'testimonials',
+            'menu_icon' => 'dashicons-format-quote',
+            // 'page-attributes' enables menu_order (Order box in the sidebar).
+            'supports' => array('title', 'page-attributes'),
+            'has_archive' => false,
+            'rewrite' => false,
+            'menu_position' => 25,
+        ));
+    }
+
+    /**
+     * Admin list columns for testimonials.
+     *
+     * @param array $columns Default columns.
+     * @return array Columns with company and quote after the title.
+     */
+    public function testimonial_columns($columns)
+    {
+        $result = array();
+        foreach ($columns as $key => $label) {
+            $result[$key] = ($key === 'title') ? 'Client name' : $label;
+            if ($key === 'title') {
+                $result['testimonial_company'] = 'Company and role';
+                $result['testimonial_quote'] = 'Quote';
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Render the custom testimonial columns.
+     *
+     * @param string $column  Column key.
+     * @param int    $post_id Testimonial ID.
+     */
+    public function render_testimonial_column($column, $post_id)
+    {
+        if (!function_exists('get_field')) {
+            return;
+        }
+        if ($column === 'testimonial_company') {
+            echo esc_html((string) get_field('company', $post_id));
+        } elseif ($column === 'testimonial_quote') {
+            echo esc_html(wp_trim_words((string) get_field('quote', $post_id), 14));
+        }
     }
 
     /**

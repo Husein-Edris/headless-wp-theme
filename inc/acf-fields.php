@@ -168,9 +168,14 @@ class HeadlessProACFFields
             'skills',
             'hobbies',
             'homepage',
+            'testimonials',
             'about-page',
             'project-case-study',
+            'project-highlight',
+            'project-facts',
+            'tech-usage-note',
             'blog-post',
+            'site-content',
         );
 
         foreach ($field_files as $file) {

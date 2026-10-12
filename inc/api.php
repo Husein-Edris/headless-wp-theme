@@ -96,6 +96,13 @@ class HeadlessProAPI
             ),
         ));
 
+        // Site-wide template text from the "Site Content" ACF options page
+        register_rest_route('headless/v1', '/site-content', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'get_site_content'),
+            'permission_callback' => '__return_true',
+        ));
+
         // Contact form endpoint
         register_rest_route('headless/v1', '/contact', array(
             'methods' => 'POST',
@@ -145,6 +152,39 @@ class HeadlessProAPI
             'wordpress_version' => get_bloginfo('version'),
             'api_endpoints' => $this->get_api_endpoints(),
         );
+    }
+
+    /**
+     * Get the "Site Content" options page values (inc/acf-fields/site-content.php).
+     *
+     * Public route, so it returns only the fields of the Site Content field
+     * group, never get_fields('option'), which would expose every option any
+     * plugin or other group stores under the shared 'options' post id.
+     * A field never saved returns its default_value; the frontend still falls
+     * back to its own text for anything empty. Always a JSON object.
+     */
+    public function get_site_content()
+    {
+        if (!function_exists('acf_get_fields') || !function_exists('get_field') || !defined('HEADLESS_PRO_SITE_CONTENT_GROUP')) {
+            return new stdClass();
+        }
+
+        $group_fields = acf_get_fields(HEADLESS_PRO_SITE_CONTENT_GROUP);
+        if (!is_array($group_fields)) {
+            return new stdClass();
+        }
+
+        $content = array();
+        foreach ($group_fields as $field) {
+            // Tabs and other layout-only fields have no name and hold no value.
+            if (empty($field['name'])) {
+                continue;
+            }
+            $value = get_field($field['name'], 'option');
+            $content[$field['name']] = is_string($value) ? $value : '';
+        }
+
+        return $content ? $content : new stdClass();
     }
 
     /**
@@ -441,7 +481,7 @@ class HeadlessProAPI
         ));
 
         // Add custom fields to custom post types
-        $custom_post_types = array('project', 'skill', 'hobby', 'tech', 'book');
+        $custom_post_types = array('project', 'skill', 'hobby', 'tech', 'book', 'testimonial');
         foreach ($custom_post_types as $post_type) {
             if (post_type_exists($post_type)) {
                 register_rest_field($post_type, 'acf_fields', array(
