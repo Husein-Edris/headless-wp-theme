@@ -165,6 +165,8 @@ class HeadlessProACFFields
         }
 
         $field_files = array(
+            // German twin cloner, used by the group files below; must load first.
+            'i18n',
             'skills',
             'hobbies',
             'homepage',
@@ -176,6 +178,7 @@ class HeadlessProACFFields
             'tech-usage-note',
             'blog-post',
             'site-content',
+            'translation-de',
         );
 
         foreach ($field_files as $file) {

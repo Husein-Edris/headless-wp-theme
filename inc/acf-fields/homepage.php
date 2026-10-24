@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-acf_add_local_field_group(array(
+acf_add_local_field_group(edris_with_de_fields(array(
     'key' => 'group_homepage_sections',
     'title' => 'Homepage Content',
     'fields' => array(
@@ -472,4 +472,4 @@ acf_add_local_field_group(array(
         'GraphqlDocumentGroup', 'PostFormat', 'Tag', 'ContentTemplate',
         'DefaultTemplate', 'Comment', 'Menu', 'MenuItem', 'User',
     ),
-));
+)));

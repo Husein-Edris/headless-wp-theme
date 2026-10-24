@@ -161,7 +161,9 @@ class HeadlessProAPI
      * group, never get_fields('option'), which would expose every option any
      * plugin or other group stores under the shared 'options' post id.
      * A field never saved returns its default_value; the frontend still falls
-     * back to its own text for anything empty. Always a JSON object.
+     * back to its own text for anything empty. German twins (<name>_de,
+     * inc/acf-fields/i18n.php) are fields of the same group, so they come back
+     * as flat keys too, empty until set. Always a JSON object.
      */
     public function get_site_content()
     {
@@ -180,7 +182,9 @@ class HeadlessProAPI
             if (empty($field['name'])) {
                 continue;
             }
-            $value = get_field($field['name'], 'option');
+            // By key: a name lookup finds no field before the page was saved once
+            // and then returns null instead of the default_value.
+            $value = get_field($field['key'], 'option');
             $content[$field['name']] = is_string($value) ? $value : '';
         }
 
@@ -505,7 +509,33 @@ class HeadlessProAPI
         }
 
         $fields = get_fields($object['id']);
-        return $fields ?: array();
+        $fields = $fields ?: array();
+
+        return $this->add_translation_keys($fields, (int) $object['id']);
+    }
+
+    /**
+     * Always return the German core twins (title_de, excerpt_de, content_de,
+     * inc/acf-fields/translation-de.php) on post types that carry them, empty
+     * when unset: get_fields() only lists fields that were saved at least once.
+     */
+    private function add_translation_keys(array $fields, int $post_id): array
+    {
+        if (!function_exists('edris_i18n_translation_post_types')) {
+            return $fields;
+        }
+
+        if (!in_array(get_post_type($post_id), edris_i18n_translation_post_types(), true)) {
+            return $fields;
+        }
+
+        foreach (array('title_de', 'excerpt_de', 'content_de') as $name) {
+            if (!isset($fields[$name])) {
+                $fields[$name] = '';
+            }
+        }
+
+        return $fields;
     }
 
     /**

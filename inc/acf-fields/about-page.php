@@ -58,7 +58,7 @@ if (function_exists('headless_pro_get_page_id_by_slug')) {
     }
 }
 
-acf_add_local_field_group(array(
+acf_add_local_field_group(edris_with_de_fields(array(
     'key' => 'group_64a1b2c3d4e63',
     'title' => 'About Page Fields',
     'fields' => array(
@@ -391,4 +391,4 @@ acf_add_local_field_group(array(
     'show_in_graphql' => 1,
     'graphql_field_name' => 'aboutPageFields',
     'map_graphql_types_from_location_rules' => 0,
-));
+)));

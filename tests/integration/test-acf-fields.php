@@ -46,6 +46,7 @@ class Test_HeadlessProACFFields extends WP_UnitTestCase {
 		}
 
 		$field_files = array(
+			'i18n', // edris_with_de_fields(), used by the group files.
 			'about-page',
 			'homepage',
 			'skills',

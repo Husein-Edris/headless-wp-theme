@@ -17,6 +17,9 @@
  * REST: GET /wp-json/headless/v1/site-content (inc/api.php).
  * Every field is optional: an empty field makes the frontend show its own
  * built-in text, which is the same as the default_value below.
+ * Every field also has a German twin <name>_de with no default
+ * (edris_with_de_fields(), inc/acf-fields/i18n.php); the endpoint returns both
+ * as flat keys.
  *
  * @package HeadlessPro
  */
@@ -102,7 +105,7 @@ if (!defined('HEADLESS_PRO_SITE_CONTENT_GROUP')) {
     define('HEADLESS_PRO_SITE_CONTENT_GROUP', 'group_site_content');
 }
 
-acf_add_local_field_group(array(
+acf_add_local_field_group(edris_with_de_fields(array(
     'key' => HEADLESS_PRO_SITE_CONTENT_GROUP,
     'title' => 'Site Content',
     'fields' => array(
@@ -200,6 +203,33 @@ acf_add_local_field_group(array(
         headless_pro_site_content_text_field('cookie_banner_reject_label', 'Reject button', 'Button that declines analytics cookies.', 'Reject all'),
         headless_pro_site_content_text_field('cookie_banner_accept_label', 'Accept button', 'Button that accepts analytics cookies.', 'Accept all'),
         headless_pro_site_content_text_field('cookie_banner_settings_label', 'Settings link', 'Link to /cookie-settings in the cookie banner.', 'Settings'),
+
+        // --- Navigation and SEO (menu labels, breadcrumbs, page titles and descriptions) ---
+        headless_pro_site_content_tab('navigation_seo', 'Navigation & SEO'),
+        headless_pro_site_content_text_field('nav_projects', 'Navigation: Projects', 'Menu label of the link to /projects.', 'Projects'),
+        headless_pro_site_content_text_field('nav_about', 'Navigation: About', 'Menu label of the link to /about.', 'About'),
+        headless_pro_site_content_text_field('nav_bookshelf', 'Navigation: Bookshelf', 'Menu label of the link to /bookshelf.', 'Bookshelf'),
+        headless_pro_site_content_text_field('nav_notebook', 'Navigation: Notebook', 'Menu label of the link to /notebook.', 'Notebook'),
+        headless_pro_site_content_text_field('nav_tech_stack', 'Navigation: Tech stack', 'Menu label of the link to /tech-stack.', 'Tech Stack'),
+        headless_pro_site_content_text_field('nav_contact', 'Navigation: Contact', 'Menu label of the link to /contact.', 'Contact'),
+        headless_pro_site_content_text_field('breadcrumb_home', 'Breadcrumb: Home', 'First breadcrumb item on case studies and articles.', 'Home'),
+        headless_pro_site_content_text_field('skip_to_content', 'Skip link', 'Keyboard and screen reader link to jump past the menu, on every page.', 'Skip to main content'),
+        headless_pro_site_content_text_field('meta_home_title', 'Homepage: SEO title', 'Browser tab and search result title of the homepage.', 'Edris Husein - Web Developer & WordPress, Vorarlberg'),
+        headless_pro_site_content_text_field('meta_home_description', 'Homepage: SEO description', 'Search result description of the homepage.', 'Web developer in Dornbirn, Vorarlberg. I build, fix and maintain WordPress sites and web apps for businesses and agencies in Austria, Switzerland and Germany.', 'textarea'),
+        headless_pro_site_content_text_field('meta_about_title', 'About: SEO title', 'Browser tab and search result title of /about.', 'About Edris Husein - Web Developer in Vorarlberg, Austria'),
+        headless_pro_site_content_text_field('meta_about_description', 'About: SEO description', 'Search result description of /about.', 'About Edris Husein, a web developer from Dornbirn, Vorarlberg, building and maintaining WordPress sites and web apps for businesses and agencies.', 'textarea'),
+        headless_pro_site_content_text_field('meta_projects_title', 'Projects: SEO title', 'Browser tab and search result title of /projects.', 'Web Development Projects & Case Studies - Edris Husein'),
+        headless_pro_site_content_text_field('meta_projects_description', 'Projects: SEO description', 'Search result description of /projects.', 'Web development projects and case studies by Edris Husein: client websites and web apps built with Next.js, React and WordPress in Austria and Germany.', 'textarea'),
+        headless_pro_site_content_text_field('meta_notebook_title', 'Notebook: SEO title', 'Browser tab and search result title of /notebook.', 'Notebook: Web Development Articles - Edris Husein'),
+        headless_pro_site_content_text_field('meta_notebook_description', 'Notebook: SEO description', 'Search result description of /notebook.', 'Web development articles and notes by Edris Husein: Next.js, React, WordPress and SEO, written from real client projects in Austria and Germany.', 'textarea'),
+        headless_pro_site_content_text_field('meta_bookshelf_title', 'Bookshelf: SEO title', 'Browser tab and search result title of /bookshelf.', 'Bookshelf: Books That Shaped How I Build - Edris Husein'),
+        headless_pro_site_content_text_field('meta_bookshelf_description', 'Bookshelf: SEO description', 'Search result description of /bookshelf.', 'The bookshelf of Edris Husein: books on software craft, design and thinking that shaped how he structures systems and writes readable code.', 'textarea'),
+        headless_pro_site_content_text_field('meta_tech_stack_title', 'Tech stack: SEO title', 'Browser tab and search result title of /tech-stack.', 'Tech Stack: Next.js, React & WordPress - Edris Husein'),
+        headless_pro_site_content_text_field('meta_tech_stack_description', 'Tech stack: SEO description', 'Search result description of /tech-stack.', 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.', 'textarea'),
+        headless_pro_site_content_text_field('meta_contact_title', 'Contact: SEO title', 'Browser tab and search result title of /contact.', 'Contact Edris Husein - Web Developer in Vorarlberg'),
+        headless_pro_site_content_text_field('meta_contact_description', 'Contact: SEO description', 'Search result description of /contact.', 'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.', 'textarea'),
+        headless_pro_site_content_text_field('meta_cookie_settings_title', 'Cookie settings: SEO title', 'Browser tab title of /cookie-settings.', 'Cookie Settings - Edris Husein'),
+        headless_pro_site_content_text_field('meta_cookie_settings_description', 'Cookie settings: SEO description', 'Search result description of /cookie-settings.', 'Manage your cookie preferences and privacy settings.', 'textarea'),
     ),
     'location' => array(
         array(
@@ -220,4 +250,4 @@ acf_add_local_field_group(array(
     'show_in_graphql' => 1,
     'graphql_field_name' => 'siteContent',
     'map_graphql_types_from_location_rules' => 0,
-));
+)));
