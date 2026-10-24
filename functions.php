@@ -356,6 +356,11 @@ function headless_pro_load_modules()
         'frontend-redirect.php'
     );
 
+    // German translation export/import: wp edris-i18n (WP-CLI only).
+    if (defined('WP_CLI') && WP_CLI) {
+        $modules[] = 'cli-i18n.php';
+    }
+
     foreach ($modules as $module) {
         $file_path = HEADLESS_THEME_PATH . '/inc/' . $module;
         if (file_exists($file_path)) {

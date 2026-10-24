@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-acf_add_local_field_group(array(
+acf_add_local_field_group(edris_with_de_fields(array(
     'key' => 'group_project_facts',
     'title' => 'Project facts',
     'fields' => array(
@@ -84,4 +84,4 @@ acf_add_local_field_group(array(
     'show_in_graphql' => 1,
     'graphql_field_name' => 'projectFacts',
     'map_graphql_types_from_location_rules' => 0,
-));
+)));
