@@ -108,7 +108,9 @@ acf_add_local_field_group(array(
     'show_in_rest' => 0,
 ));
 
-acf_add_local_field_group(array(
+// The section heading and slider labels get German twins; the quotes in
+// group_testimonial_post stay in the language the client wrote them.
+acf_add_local_field_group(edris_with_de_fields(array(
     'key' => 'group_homepage_testimonials',
     'title' => 'Testimonials',
     'fields' => array(
@@ -182,4 +184,4 @@ acf_add_local_field_group(array(
     'instruction_placement' => 'label',
     'active' => true,
     'show_in_rest' => 0,
-));
+)));
