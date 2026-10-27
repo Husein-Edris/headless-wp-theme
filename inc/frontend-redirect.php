@@ -69,9 +69,19 @@ function redirect_frontend_to_main_site() {
 
 // CMS permalinks differ from the frontend routes (posts live under /notebook, books on
 // /bookshelf, ...), so keeping the path sent most CMS URLs to a 404 on the frontend.
-// $object comes from headless_pro_redirect_object(). Unknown content keeps its path.
+// $object comes from headless_pro_redirect_object(). Unknown content keeps its path; a
+// mapped route keeps the query string so tracking parameters (utm_*) survive the redirect.
 function headless_pro_frontend_path(string $path, array $object): string {
-    $path_only = (string) wp_parse_url($path, PHP_URL_PATH);
+    $route = headless_pro_frontend_route((string) wp_parse_url($path, PHP_URL_PATH), $object);
+    if ($route === null) {
+        return $path;
+    }
+    $query = (string) wp_parse_url($path, PHP_URL_QUERY);
+    return $query === '' ? $route : $route . '?' . $query;
+}
+
+// Frontend route for a CMS path, or null when the frontend has no matching route.
+function headless_pro_frontend_route(string $path_only, array $object): ?string {
     if (preg_match('#^/[a-z0-9_-]*sitemap[a-z0-9_-]*\.xml$#i', $path_only)) {
         return '/sitemap.xml';
     }
@@ -108,7 +118,7 @@ function headless_pro_frontend_path(string $path, array $object): string {
         return ($object['taxonomy'] ?? '') === 'tech_category' ? '/tech-stack' : '/notebook';
     }
 
-    return $path;
+    return null;
 }
 
 // Describe the queried CMS object for headless_pro_frontend_path().

@@ -33,6 +33,9 @@ class Test_HeadlessProFrontendPath extends WP_UnitTestCase {
 			'tech category to tech stack'   => array( '/tech-category/cms/', array( 'kind' => 'term', 'taxonomy' => 'tech_category' ), '/tech-stack' ),
 			'unknown path is kept'          => array( '/test-post', array( 'kind' => 'other' ), '/test-post' ),
 			'unknown path keeps its query'  => array( '/?s=wordpress', array( 'kind' => 'other' ), '/?s=wordpress' ),
+			'mapped post keeps its query'   => array( '/website-erstellen-lassen/?utm_source=x&utm_medium=y', array( 'kind' => 'singular', 'post_type' => 'post', 'slug' => 'website-erstellen-lassen' ), '/notebook/website-erstellen-lassen?utm_source=x&utm_medium=y' ),
+			'mapped page keeps its query'   => array( '/about-me/?utm_source=x', array( 'kind' => 'singular', 'post_type' => 'page', 'slug' => 'about-me' ), '/about?utm_source=x' ),
+			'mapped term keeps its query'   => array( '/category/blog/?utm_source=x', array( 'kind' => 'term', 'taxonomy' => 'category' ), '/notebook?utm_source=x' ),
 		);
 	}
 
