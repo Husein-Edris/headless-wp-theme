@@ -37,10 +37,8 @@ function redirect_frontend_to_main_site() {
     }
 
     // Preserve these endpoints (allowlist).
-    foreach (HeadlessProConfig::get_frontend_redirect_allowlist() as $pattern) {
-        if (strpos($request_uri, $pattern) !== false) {
-            return; // Don't redirect API endpoints
-        }
+    if (headless_pro_is_allowlisted($request_uri, HeadlessProConfig::get_frontend_redirect_allowlist())) {
+        return; // Don't redirect API endpoints
     }
 
     // Don't redirect if accessing via cron or CLI
@@ -65,6 +63,18 @@ function redirect_frontend_to_main_site() {
     $target = rtrim($frontend, '/') . headless_pro_frontend_path($path, headless_pro_redirect_object());
     wp_redirect($target, 301);
     exit;
+}
+
+// Allowlist entries are path prefixes. A substring match let content URLs such as
+// /technologies/graphql/ (matching '/graphql') skip the redirect and render on the CMS.
+function headless_pro_is_allowlisted(string $request_uri, array $allowlist): bool {
+    $path = (string) wp_parse_url($request_uri, PHP_URL_PATH);
+    foreach ($allowlist as $pattern) {
+        if ($pattern !== '' && strpos($path, $pattern) === 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // CMS permalinks differ from the frontend routes (posts live under /notebook, books on

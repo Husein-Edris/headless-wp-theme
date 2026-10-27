@@ -54,4 +54,26 @@ class Test_HeadlessProFrontendPath extends WP_UnitTestCase {
 			'plain sitemap.xml'  => array( '/sitemap.xml' ),
 		);
 	}
+
+	/**
+	 * @dataProvider allowlist_provider
+	 */
+	public function test_allowlist_matches_path_prefixes_only( string $uri, bool $expected ): void {
+		$allowlist = HeadlessProConfig::get_default_frontend_redirect_allowlist();
+
+		$this->assertSame( $expected, headless_pro_is_allowlisted( $uri, $allowlist ) );
+	}
+
+	public function allowlist_provider(): array {
+		return array(
+			'REST API'                    => array( '/wp-json/wp/v2/posts?utm_source=x', true ),
+			'GraphQL endpoint'            => array( '/graphql', true ),
+			'uploads'                     => array( '/wp-content/uploads/a.jpg', true ),
+			'login with query'            => array( '/wp-login.php?action=lostpassword', true ),
+			'main feed'                   => array( '/feed/', true ),
+			'tech named graphql'          => array( '/technologies/graphql/', false ),
+			'allowlist word in the query' => array( '/about-me/?next=/wp-admin/', false ),
+			'post'                        => array( '/website-erstellen-lassen/', false ),
+		);
+	}
 }
