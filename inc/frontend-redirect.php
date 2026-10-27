@@ -60,11 +60,80 @@ function redirect_frontend_to_main_site() {
         return;
     }
 
-    // Redirect all other frontend requests to main site (preserve path/query).
-    $target = rtrim($frontend, '/') . (strpos($request_uri, '/') === 0 ? $request_uri : '/' . $request_uri);
+    // Redirect all other frontend requests to the frontend route for the same content.
+    $path = strpos($request_uri, '/') === 0 ? $request_uri : '/' . $request_uri;
+    $target = rtrim($frontend, '/') . headless_pro_frontend_path($path, headless_pro_redirect_object());
     wp_redirect($target, 301);
     exit;
 }
 
+// CMS permalinks differ from the frontend routes (posts live under /notebook, books on
+// /bookshelf, ...), so keeping the path sent most CMS URLs to a 404 on the frontend.
+// $object comes from headless_pro_redirect_object(). Unknown content keeps its path.
+function headless_pro_frontend_path(string $path, array $object): string {
+    $path_only = (string) wp_parse_url($path, PHP_URL_PATH);
+    if (preg_match('#^/[a-z0-9_-]*sitemap[a-z0-9_-]*\.xml$#i', $path_only)) {
+        return '/sitemap.xml';
+    }
+
+    $section = array(
+        'book'  => '/bookshelf',
+        'tech'  => '/tech-stack',
+        'skill' => '/about',
+        'hobby' => '/about',
+    );
+    $kind = $object['kind'] ?? 'other';
+    $post_type = $object['post_type'] ?? '';
+    $slug = $object['slug'] ?? '';
+
+    if (($kind === 'singular' || $kind === 'archive') && isset($section[$post_type])) {
+        return $section[$post_type];
+    }
+    if ($kind === 'singular' && $post_type === 'post' && $slug !== '') {
+        return '/notebook/' . $slug;
+    }
+    if ($kind === 'singular' && $post_type === 'project' && $slug !== '') {
+        return '/projects/' . $slug;
+    }
+    if ($kind === 'singular' && $post_type === 'page' && $slug === 'about-me') {
+        return '/about';
+    }
+    if ($kind === 'singular' && $post_type === 'page' && $slug === 'home') {
+        return '/';
+    }
+    if ($kind === 'archive' && $post_type === 'project') {
+        return '/projects';
+    }
+    if ($kind === 'term') {
+        return ($object['taxonomy'] ?? '') === 'tech_category' ? '/tech-stack' : '/notebook';
+    }
+
+    return $path;
+}
+
+// Describe the queried CMS object for headless_pro_frontend_path().
+function headless_pro_redirect_object(): array {
+    if (is_singular()) {
+        $post = get_queried_object();
+        if ($post instanceof WP_Post) {
+            return array('kind' => 'singular', 'post_type' => $post->post_type, 'slug' => $post->post_name);
+        }
+    }
+    if (is_post_type_archive()) {
+        $post_type = get_query_var('post_type');
+        return array('kind' => 'archive', 'post_type' => is_array($post_type) ? (string) reset($post_type) : (string) $post_type);
+    }
+    if (is_category() || is_tag() || is_tax()) {
+        $term = get_queried_object();
+        if ($term instanceof WP_Term) {
+            return array('kind' => 'term', 'taxonomy' => $term->taxonomy);
+        }
+    }
+    return array('kind' => 'other');
+}
+
 // Hook into template_redirect (runs before any HTML is output)
 add_action('template_redirect', 'redirect_frontend_to_main_site');
+
+// The frontend publishes the only sitemap; WordPress core would otherwise list CMS URLs.
+add_filter('wp_sitemaps_enabled', '__return_false');
