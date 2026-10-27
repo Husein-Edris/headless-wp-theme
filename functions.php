@@ -105,7 +105,6 @@ class HeadlessProConfig
             '/.well-known/',       // SSL verification, etc.
             '/xmlrpc.php',         // XML-RPC (if needed)
             '/feed/',              // RSS feeds
-            '/sitemap',            // Sitemaps
         );
     }
 

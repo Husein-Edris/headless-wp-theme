@@ -66,20 +66,40 @@ class Test_HeadlessProRedirect extends WP_UnitTestCase {
 			'WP includes' => array( '/wp-includes/js/jquery.js' ),
 			'Well-known'  => array( '/.well-known/acme-challenge/test' ),
 			'RSS feed'    => array( '/feed/' ),
-			'Sitemap'     => array( '/sitemap.xml' ),
 		);
 	}
 
-	public function test_frontend_page_triggers_301_to_frontend_url(): void {
+	public function test_about_page_redirects_to_frontend_about_route(): void {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_name' => 'about-me' ) );
+		$this->go_to( get_permalink( $page_id ) );
 		$_SERVER['REQUEST_URI'] = '/about-me/';
 
+		$this->assertSame( HeadlessProConfig::get_frontend_url() . '/about', $this->capture_redirect()->location );
+	}
+
+	public function test_post_redirects_under_notebook(): void {
+		$post_id = self::factory()->post->create( array( 'post_name' => 'website-erstellen-lassen' ) );
+		$this->go_to( get_permalink( $post_id ) );
+		$_SERVER['REQUEST_URI'] = '/website-erstellen-lassen/';
+
+		$redirect = $this->capture_redirect();
+		$this->assertSame( HeadlessProConfig::get_frontend_url() . '/notebook/website-erstellen-lassen', $redirect->location );
+		$this->assertSame( 301, $redirect->redirect_status );
+	}
+
+	public function test_sitemap_redirects_to_frontend_sitemap(): void {
+		$_SERVER['REQUEST_URI'] = '/sitemap_index.xml';
+
+		$this->assertSame( HeadlessProConfig::get_frontend_url() . '/sitemap.xml', $this->capture_redirect()->location );
+	}
+
+	private function capture_redirect(): HeadlessPro_Redirect_Exception {
 		try {
 			redirect_frontend_to_main_site();
-			$this->fail( 'Expected a redirect but none occurred.' );
 		} catch ( HeadlessPro_Redirect_Exception $e ) {
-			$this->assertEquals( HeadlessProConfig::get_frontend_url(), $e->location );
-			$this->assertEquals( 301, $e->redirect_status );
+			return $e;
 		}
+		$this->fail( 'Expected a redirect but none occurred.' );
 	}
 
 	public function test_root_url_triggers_redirect(): void {
