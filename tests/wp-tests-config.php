@@ -32,7 +32,8 @@ define( 'WP_TESTS_SUBDOMAIN_INSTALL', false );
 $table_prefix = 'wptests_';
 
 // PHP binary path (required by WP test suite).
-define( 'WP_PHP_BINARY', '/Applications/Local.app/Contents/Resources/extraResources/lightning-services/php-8.2.27+1/bin/darwin/bin/php' );
+// Defaults to the interpreter running PHPUnit, so a Local PHP upgrade does not break the suite.
+define( 'WP_PHP_BINARY', getenv( 'WP_PHP_BINARY' ) ?: PHP_BINARY );
 
 // PHPUnit polyfills path (required since WP 5.8.2).
 define(

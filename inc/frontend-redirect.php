@@ -115,6 +115,10 @@ function headless_pro_frontend_route(string $path_only, array $object): ?string 
     if ($kind === 'singular' && $post_type === 'project' && $slug !== '') {
         return '/projects/' . $slug;
     }
+    if ($kind === 'singular' && $post_type === 'service' && $slug !== '') {
+        // The post slug is the English one; the German slug lives in ACF slug_de.
+        return '/services/' . $slug;
+    }
     if ($kind === 'singular' && $post_type === 'page' && $slug === 'about-me') {
         return '/about';
     }
@@ -123,6 +127,9 @@ function headless_pro_frontend_route(string $path_only, array $object): ?string 
     }
     if ($kind === 'archive' && $post_type === 'project') {
         return '/projects';
+    }
+    if ($kind === 'archive' && $post_type === 'service') {
+        return '/services';
     }
     if ($kind === 'term') {
         return ($object['taxonomy'] ?? '') === 'tech_category' ? '/tech-stack' : '/notebook';
