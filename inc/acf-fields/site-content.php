@@ -4,8 +4,8 @@
  * ACF Options Page: Site Content
  *
  * Text that belongs to a template or an archive rather than to one page:
- * the /projects, /notebook, /bookshelf, /tech-stack and /contact pages, the
- * project cards, the case study and article templates, and shared chrome
+ * the /projects, /services, /notebook, /bookshelf, /tech-stack and /contact
+ * pages, the project cards, the case study, service and article templates, and shared chrome
  * (footer, 404 page, cookie banner). None of these has its own WordPress page
  * to hold fields.
  *
@@ -53,9 +53,10 @@ if (!function_exists('headless_pro_site_content_text_field')) {
      * @param string $where   Where the text appears on the site.
      * @param string $default Text the frontend shows while the field is empty.
      * @param string $type    ACF field type (text or textarea).
+     * @param string $default_de German default for the twin, matching the frontend's German fallback.
      * @return array ACF field definition.
      */
-    function headless_pro_site_content_text_field(string $name, string $label, string $where, string $default, string $type = 'text'): array
+    function headless_pro_site_content_text_field(string $name, string $label, string $where, string $default, string $type = 'text', string $default_de = ''): array
     {
         $field = array(
             'key' => 'field_site_content_' . $name,
@@ -66,6 +67,9 @@ if (!function_exists('headless_pro_site_content_text_field')) {
             'default_value' => $default,
             'show_in_graphql' => 1,
         );
+        if ($default_de !== '') {
+            $field['default_value_de'] = $default_de;
+        }
 
         if ($type === 'textarea') {
             $field['rows'] = 5;
@@ -141,7 +145,17 @@ acf_add_local_field_group(edris_with_de_fields(array(
         headless_pro_site_content_text_field('case_study_lightbox_close_label', 'Gallery lightbox: Close label', 'Screen reader label of the close button in the full-screen gallery view.', 'Close'),
         headless_pro_site_content_text_field('case_study_lightbox_previous_label', 'Gallery lightbox: Previous label', 'Screen reader label of the previous image button in the full-screen gallery view.', 'Previous image'),
         headless_pro_site_content_text_field('case_study_lightbox_next_label', 'Gallery lightbox: Next label', 'Screen reader label of the next image button in the full-screen gallery view.', 'Next image'),
+        headless_pro_site_content_text_field('case_study_service_label', 'Service link label', 'Label before the link to the service page that lists this case study, e.g. Service: Website relaunch.', 'Service', 'text', 'Leistung'),
         headless_pro_site_content_text_field('case_study_lightbox_counter_format', 'Gallery lightbox: Counter format', 'Image counter in the full-screen gallery view. {current} is the open image, {total} the image count.', '{current} / {total}'),
+
+        // --- Services index (/services) and service template (/services/<slug>) ---
+        // The closing call to action is per page (inc/acf-fields/service-page.php).
+        headless_pro_site_content_tab('services_page', 'Services pages'),
+        headless_pro_site_content_text_field('services_page_title', 'Page heading', 'Large heading at the top of /services.', 'SERVICES', 'text', 'LEISTUNGEN'),
+        headless_pro_site_content_text_field('services_page_subtitle', 'Subtitle', 'Line under the heading on /services.', 'New websites, relaunches and WordPress maintenance', 'text', 'Neue Websites, Relaunches und WordPress-Wartung'),
+        headless_pro_site_content_text_field('service_faq_heading', 'FAQ heading', 'Heading above the questions on every service page.', 'FAQ', 'text', 'Häufige Fragen'),
+        headless_pro_site_content_text_field('service_projects_heading', 'Projects heading', 'Heading above the linked case studies on every service page.', 'Case studies', 'text', 'Fallstudien'),
+        headless_pro_site_content_text_field('service_posts_heading', 'Articles heading', 'Heading above the linked articles on every service page.', 'Further reading', 'text', 'Weiterlesen'),
 
         // --- Contact page (/contact) ---
         headless_pro_site_content_tab('contact_page', 'Contact page'),
@@ -212,6 +226,7 @@ acf_add_local_field_group(edris_with_de_fields(array(
         headless_pro_site_content_text_field('nav_notebook', 'Navigation: Notebook', 'Menu label of the link to /notebook.', 'Notebook'),
         headless_pro_site_content_text_field('nav_tech_stack', 'Navigation: Tech stack', 'Menu label of the link to /tech-stack.', 'Tech Stack'),
         headless_pro_site_content_text_field('nav_contact', 'Navigation: Contact', 'Menu label of the link to /contact.', 'Contact'),
+        headless_pro_site_content_text_field('nav_services', 'Navigation: Services', 'Menu label of the link to /services, also the breadcrumb item on service pages.', 'Services', 'text', 'Leistungen'),
         headless_pro_site_content_text_field('breadcrumb_home', 'Breadcrumb: Home', 'First breadcrumb item on case studies and articles.', 'Home'),
         headless_pro_site_content_text_field('skip_to_content', 'Skip link', 'Keyboard and screen reader link to jump past the menu, on every page.', 'Skip to main content'),
         headless_pro_site_content_text_field('meta_home_title', 'Homepage: SEO title', 'Browser tab and search result title of the homepage.', 'Edris Husein - Web Developer & WordPress, Vorarlberg'),
@@ -228,6 +243,8 @@ acf_add_local_field_group(edris_with_de_fields(array(
         headless_pro_site_content_text_field('meta_tech_stack_description', 'Tech stack: SEO description', 'Search result description of /tech-stack.', 'The tech stack Edris Husein builds with: Next.js, React, TypeScript and WordPress, plus the tools, apps and devices behind his web development work.', 'textarea'),
         headless_pro_site_content_text_field('meta_contact_title', 'Contact: SEO title', 'Browser tab and search result title of /contact.', 'Contact Edris Husein - Web Developer in Vorarlberg'),
         headless_pro_site_content_text_field('meta_contact_description', 'Contact: SEO description', 'Search result description of /contact.', 'Contact Edris Husein, a freelance web developer in Vorarlberg, Austria, for WordPress sites, maintenance, fixes and Next.js projects. Replies within a day.', 'textarea'),
+        headless_pro_site_content_text_field('meta_services_title', 'Services: SEO title', 'Browser tab and search result title of /services.', 'Web Development Services | Edris Husein', 'text', 'Leistungen: Websites, Relaunch, WordPress | Edris Husein'),
+        headless_pro_site_content_text_field('meta_services_description', 'Services: SEO description', 'Search result description of /services.', 'Services by Edris Husein, web developer in Dornbirn: new websites, relaunches, WordPress maintenance, custom WordPress development and headless builds.', 'textarea', 'Leistungen von Edris Husein, Webentwickler in Dornbirn: Websites erstellen, Relaunch, WordPress-Wartung, WordPress-Entwicklung und Headless WordPress.'),
         headless_pro_site_content_text_field('meta_cookie_settings_title', 'Cookie settings: SEO title', 'Browser tab title of /cookie-settings.', 'Cookie Settings - Edris Husein'),
         headless_pro_site_content_text_field('meta_cookie_settings_description', 'Cookie settings: SEO description', 'Search result description of /cookie-settings.', 'Manage your cookie preferences and privacy settings.', 'textarea'),
     ),

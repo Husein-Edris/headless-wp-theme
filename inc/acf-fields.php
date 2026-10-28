@@ -177,6 +177,7 @@ class HeadlessProACFFields
             'project-facts',
             'tech-usage-note',
             'blog-post',
+            'service-page',
             'site-content',
             'translation-de',
         );

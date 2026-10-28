@@ -6,7 +6,7 @@
  * GraphQL field name: homepageSections
  * Location: Front page
  *
- * 7 sections: Hero, Projects, About Me, Bookshelf, Tech Stack, Notebook, Contact
+ * 8 sections: Hero, Projects, Services, About Me, Bookshelf, Tech Stack, Notebook, Contact
  *
  * @package HeadlessPro
  */
@@ -175,6 +175,48 @@ acf_add_local_field_group(edris_with_de_fields(array(
                     'default_value' => '/projects',
                     'show_in_graphql' => 1,
                     'graphql_field_name' => 'viewAllUrl',
+                ),
+            ),
+        ),
+
+        // --- Services Tab ---
+        array(
+            'key' => 'field_tab_services',
+            'label' => 'Services',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
+        ),
+
+        // --- Services Section ---
+        array(
+            'key' => 'field_services_section',
+            'label' => 'Services Section',
+            'name' => 'services_section',
+            'type' => 'group',
+            'instructions' => 'Services section on the homepage, shown once at least one service is published. The cards come from the Services menu.',
+            'layout' => 'block',
+            'show_in_graphql' => 1,
+            'graphql_field_name' => 'servicesSection',
+            'sub_fields' => array(
+                array(
+                    'key' => 'field_services_title',
+                    'label' => 'Title',
+                    'name' => 'title',
+                    'type' => 'text',
+                    'instructions' => 'Section title. Leave empty to show: SERVICES',
+                    'default_value' => 'SERVICES',
+                    'show_in_graphql' => 1,
+                ),
+                array(
+                    'key' => 'field_services_text',
+                    'label' => 'Text',
+                    'name' => 'text',
+                    'type' => 'textarea',
+                    'instructions' => 'Short line under the title. Plain text. Leave empty to hide it.',
+                    'rows' => 3,
+                    'new_lines' => '',
+                    'show_in_graphql' => 1,
                 ),
             ),
         ),

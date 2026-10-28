@@ -87,6 +87,25 @@ class Test_HeadlessProRedirect extends WP_UnitTestCase {
 		$this->assertSame( 301, $redirect->redirect_status );
 	}
 
+	public function test_service_redirects_under_services(): void {
+		$service_id = self::factory()->post->create( array( 'post_type' => 'service', 'post_name' => 'website-development' ) );
+		$this->go_to( get_permalink( $service_id ) );
+		$_SERVER['REQUEST_URI'] = '/services/website-development/';
+
+		$redirect = $this->capture_redirect();
+		$this->assertSame( HeadlessProConfig::get_frontend_url() . '/services/website-development', $redirect->location );
+		$this->assertSame( 301, $redirect->redirect_status );
+	}
+
+	public function test_service_archive_redirects_to_services_index(): void {
+		// One published service, so the archive query is not a 404.
+		self::factory()->post->create( array( 'post_type' => 'service', 'post_name' => 'website-redesign' ) );
+		$this->go_to( get_post_type_archive_link( 'service' ) );
+		$_SERVER['REQUEST_URI'] = '/services/';
+
+		$this->assertSame( HeadlessProConfig::get_frontend_url() . '/services', $this->capture_redirect()->location );
+	}
+
 	public function test_sitemap_redirects_to_frontend_sitemap(): void {
 		$_SERVER['REQUEST_URI'] = '/sitemap_index.xml';
 

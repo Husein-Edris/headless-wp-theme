@@ -75,7 +75,9 @@ if (!function_exists('edris_i18n_make_de_field')) {
         $twin['name'] = $field['name'] . EDRIS_I18N_SUFFIX;
         $twin['label'] = ($field['label'] ?? $field['name']) . ' (DE)';
         $twin['required'] = 0;
-        $twin['default_value'] = '';
+        // A source may declare 'default_value_de'; otherwise the twin starts empty.
+        $twin['default_value'] = (string) ($field['default_value_de'] ?? '');
+        unset($twin['default_value_de']);
         $twin['conditional_logic'] = 0;
 
         if (!empty($field['graphql_field_name'])) {

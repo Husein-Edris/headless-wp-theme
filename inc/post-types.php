@@ -37,6 +37,7 @@ class HeadlessProPostTypes
         $this->register_tech_cpt();
         $this->register_books_cpt();
         $this->register_testimonials_cpt();
+        $this->register_services_cpt();
     }
 
     /**
@@ -285,6 +286,46 @@ class HeadlessProPostTypes
             'has_archive' => false,
             'rewrite' => false,
             'menu_position' => 25,
+        ));
+    }
+
+    /**
+     * Register Services Custom Post Type
+     *
+     * One service page per post (website development, relaunch, maintenance, ...).
+     * Read by the headless frontend over REST at /wp/v2/service; routes are
+     * /services/<slug> (EN, post slug) and /de/services/<slug_de> (DE, ACF field in
+     * inc/acf-fields/service-page.php). Not exposed to WPGraphQL, which has been
+     * deactivated since 2026-06-22. Editor = intro, excerpt = card teaser,
+     * menu_order = order on /services and in the home services section.
+     */
+    private function register_services_cpt()
+    {
+        register_post_type('service', array(
+            'labels' => array(
+                'name' => 'Services',
+                'singular_name' => 'Service',
+                'add_new' => 'Add New',
+                'add_new_item' => 'Add New Service',
+                'edit_item' => 'Edit Service',
+                'new_item' => 'New Service',
+                'view_item' => 'View Service',
+                'search_items' => 'Search Services',
+                'not_found' => 'No services found',
+                'not_found_in_trash' => 'No services found in Trash',
+                'all_items' => 'All Services',
+                'archives' => 'Service Archives',
+                'insert_into_item' => 'Insert into service',
+                'uploaded_to_this_item' => 'Uploaded to this service',
+            ),
+            'public' => true,
+            'show_in_rest' => true,
+            'show_in_graphql' => false,
+            'menu_icon' => 'dashicons-hammer',
+            'supports' => array('title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'revisions'),
+            'has_archive' => true,
+            'rewrite' => array('slug' => 'services'),
+            'menu_position' => 21,
         ));
     }
 

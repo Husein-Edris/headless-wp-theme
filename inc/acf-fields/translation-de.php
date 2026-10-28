@@ -8,7 +8,7 @@
  * The German twins of ACF text fields are added by edris_with_de_fields()
  * (inc/acf-fields/i18n.php); this group is not wrapped with it.
  *
- * Post types: post, project, page, tech, book, hobby, skill.
+ * Post types: post, project, page, tech, book, hobby, skill, service.
  * Exposed over REST as acf_fields.title_de, excerpt_de, content_de
  * (inc/api.php always returns the three keys, empty when unset).
  *
@@ -27,7 +27,7 @@ if (!function_exists('edris_i18n_translation_post_types')) {
      */
     function edris_i18n_translation_post_types(): array
     {
-        return array('post', 'project', 'page', 'tech', 'book', 'hobby', 'skill');
+        return array('post', 'project', 'page', 'tech', 'book', 'hobby', 'skill', 'service');
     }
 }
 

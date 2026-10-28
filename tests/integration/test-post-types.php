@@ -29,6 +29,33 @@ class Test_HeadlessProPostTypes extends WP_UnitTestCase {
 		}
 	}
 
+	// WPGraphQL is deactivated since 2026-06-22, so service is checked on its own
+	// instead of joining the GraphQL-asserting $cpts list.
+	public function test_service_cpt_is_public_in_rest_under_services(): void {
+		$this->assertTrue( post_type_exists( 'service' ), 'service should exist.' );
+
+		$obj = get_post_type_object( 'service' );
+		$this->assertTrue( $obj->public, 'service should be public.' );
+		$this->assertTrue( $obj->show_in_rest, 'service should show in REST.' );
+		$this->assertSame( '/wp/v2/service', rest_get_route_for_post_type_items( 'service' ) );
+		$this->assertEmpty( $obj->show_in_graphql, 'service should stay out of GraphQL.' );
+		$this->assertTrue( $obj->has_archive );
+		$this->assertSame( 'services', $obj->rewrite['slug'] );
+		$this->assertSame( 'dashicons-hammer', $obj->menu_icon );
+		$this->assertSame( 'Services', $obj->labels->name );
+		$this->assertSame( 'Service', $obj->labels->singular_name );
+		$this->assertSame( 'Add New Service', $obj->labels->add_new_item );
+		$this->assertSame( 'All Services', $obj->labels->all_items );
+	}
+
+	public function test_service_cpt_supports_plan_features(): void {
+		$expected = array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'revisions' );
+
+		foreach ( $expected as $feature ) {
+			$this->assertTrue( post_type_supports( 'service', $feature ), "service should support '{$feature}'." );
+		}
+	}
+
 	public function test_all_cpts_support_required_features(): void {
 		$expected = array( 'title', 'editor', 'thumbnail', 'excerpt' );
 

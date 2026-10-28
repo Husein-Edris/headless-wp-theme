@@ -291,14 +291,14 @@ class Test_HeadlessProACFFields extends WP_UnitTestCase {
 	// =========================================================================
 
 	/**
-	 * T014: Homepage field group has 14 top-level fields (7 tabs + 7 groups).
+	 * T014: Homepage field group has 16 top-level fields (8 tabs + 8 groups).
 	 */
 	public function test_homepage_has_tabs_and_groups(): void {
 		$group = $this->get_group( 'group_homepage_sections' );
 		$this->assertNotNull( $group, 'Homepage field group should be captured.' );
 
 		$fields = $group['fields'];
-		$this->assertCount( 14, $fields, 'Homepage should have 14 top-level fields (7 tabs + 7 groups).' );
+		$this->assertCount( 16, $fields, 'Homepage should have 16 top-level fields (8 tabs + 8 groups).' );
 
 		$tabs = array_filter( $fields, function( $f ) {
 			return $f['type'] === 'tab';
@@ -307,8 +307,8 @@ class Test_HeadlessProACFFields extends WP_UnitTestCase {
 			return $f['type'] === 'group';
 		} );
 
-		$this->assertCount( 7, $tabs, 'Homepage should have 7 tab fields.' );
-		$this->assertCount( 7, $groups, 'Homepage should have 7 group fields.' );
+		$this->assertCount( 8, $tabs, 'Homepage should have 8 tab fields.' );
+		$this->assertCount( 8, $groups, 'Homepage should have 8 group fields.' );
 
 		foreach ( $tabs as $tab ) {
 			$this->assertEquals( 'top', $tab['placement'], "Tab '{$tab['label']}' should have placement top." );
@@ -323,7 +323,7 @@ class Test_HeadlessProACFFields extends WP_UnitTestCase {
 		$this->assertNotNull( $group, 'Homepage field group should be captured.' );
 
 		$expected_labels = array(
-			'Hero', 'Projects', 'About Me', 'Bookshelf', 'Tech Stack', 'Notebook', 'Contact',
+			'Hero', 'Projects', 'Services', 'About Me', 'Bookshelf', 'Tech Stack', 'Notebook', 'Contact',
 		);
 
 		$tab_labels = array();

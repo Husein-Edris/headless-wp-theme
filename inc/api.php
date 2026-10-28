@@ -485,7 +485,7 @@ class HeadlessProAPI
         ));
 
         // Add custom fields to custom post types
-        $custom_post_types = array('project', 'skill', 'hobby', 'tech', 'book', 'testimonial');
+        $custom_post_types = array('project', 'skill', 'hobby', 'tech', 'book', 'testimonial', 'service');
         foreach ($custom_post_types as $post_type) {
             if (post_type_exists($post_type)) {
                 register_rest_field($post_type, 'acf_fields', array(
@@ -511,7 +511,25 @@ class HeadlessProAPI
         $fields = get_fields($object['id']);
         $fields = $fields ?: array();
 
-        return $this->add_translation_keys($fields, (int) $object['id']);
+        $fields = $this->add_translation_keys($fields, (int) $object['id']);
+
+        return $this->add_service_routing_keys($fields, (int) $object['id']);
+    }
+
+    /**
+     * Always return slug_de (German slug, inc/acf-fields/service-page.php) on
+     * services, empty when unset: get_fields() only lists fields that were
+     * saved at least once, and the frontend builds the German route from it.
+     */
+    private function add_service_routing_keys(array $fields, int $post_id): array
+    {
+        if (get_post_type($post_id) !== 'service' || isset($fields['slug_de'])) {
+            return $fields;
+        }
+
+        $fields['slug_de'] = '';
+
+        return $fields;
     }
 
     /**
