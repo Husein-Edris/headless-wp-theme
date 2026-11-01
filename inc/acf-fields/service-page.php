@@ -348,6 +348,23 @@ acf_add_local_field_group(edris_with_de_fields(array(
             'filters' => array('search'),
         ),
         array(
+            'key' => 'field_service_showcase_image',
+            'label' => 'Showcase image',
+            'name' => 'showcase_image',
+            'type' => 'image',
+            'instructions' => 'Shown on this page and its /services row only when no related project has a screenshot, e.g. a real maintenance report (no client names). Landscape 16:10, shown whole.',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'library' => 'all',
+        ),
+        array(
+            'key' => 'field_service_showcase_caption',
+            'label' => 'Showcase caption',
+            'name' => 'showcase_caption',
+            'type' => 'text',
+            'instructions' => 'Line under the showcase image, e.g. Monthly maintenance report, September 2026.',
+        ),
+        array(
             'key' => 'field_service_testimonial',
             'label' => 'Testimonial',
             'name' => 'testimonial',
