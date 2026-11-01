@@ -5,8 +5,9 @@
  *
  * Two groups on the service post type (inc/post-types.php):
  * 1. "Service page" (group_service_page): SEO title and description, H1,
- *    H2 sections, FAQ, linked case studies and articles, schema data and the
- *    closing call to action. Wrapped in edris_with_de_fields(), so every text,
+ *    hero note and card icon, "What you get" items, steps, short text blocks,
+ *    FAQ, linked case studies, articles and one testimonial, schema data and
+ *    the closing call to action. Wrapped in edris_with_de_fields(), so every text,
  *    textarea and wysiwyg field has a German twin <name>_de.
  * 2. "Service routing" (group_service_routing): slug_de, the German URL slug
  *    (/de/services/<slug_de>; the post slug is the English one). Not wrapped,
@@ -55,6 +56,22 @@ if (!function_exists('headless_pro_validate_service_slug_de')) {
 }
 
 add_filter('acf/validate_value/key=' . HEADLESS_PRO_SERVICE_SLUG_DE_FIELD, 'headless_pro_validate_service_slug_de', 10, 2);
+
+// Keys match SERVICE_ICON_KEYS in the frontend (src/lib/service-icons.ts).
+$headless_pro_service_icons = array(
+                'code' => 'Code',
+                'layout' => 'Layout / design',
+                'mobile' => 'Mobile',
+                'search' => 'Search / SEO',
+                'edit' => 'Edit content',
+                'key' => 'Ownership / access',
+                'speed' => 'Speed',
+                'shield' => 'Security',
+                'update' => 'Updates',
+                'redirect' => 'Redirects',
+                'wrench' => 'Repair',
+                'chat' => 'Talk / support',
+);
 
 $headless_pro_service_location = array(
     array(
@@ -119,6 +136,23 @@ acf_add_local_field_group(edris_with_de_fields(array(
             'type' => 'text',
             'instructions' => 'Editorial note, not shown on the site: the search phrase this page targets.',
         ),
+        array(
+            'key' => 'field_service_hero_note',
+            'label' => 'Note under the button',
+            'name' => 'hero_note',
+            'type' => 'text',
+            'instructions' => 'Short line under the hero button, e.g. Replies within one working day. Leave empty to hide it.',
+        ),
+        array(
+            'key' => 'field_service_icon',
+            'label' => 'Card icon',
+            'name' => 'icon',
+            'type' => 'select',
+            'instructions' => 'Icon on the service card on /services.',
+            'choices' => $headless_pro_service_icons,
+            'default_value' => 'code',
+            'return_format' => 'value',
+        ),
 
         // --- Sections (H2 blocks) ---
         array(
@@ -133,9 +167,9 @@ acf_add_local_field_group(edris_with_de_fields(array(
             'label' => 'Sections',
             'name' => 'sections',
             'type' => 'repeater',
-            'instructions' => 'Body of the page after the intro. Each section is one H2 with its text. At least two.',
+            'instructions' => 'Short text blocks after the steps, shown side by side, e.g. Freelancer or agency. One or two work best.',
             'layout' => 'block',
-            'min' => 2,
+            'min' => 0,
             'max' => 0,
             'collapsed' => 'field_service_sections_heading',
             'button_label' => 'Add section',
@@ -157,6 +191,85 @@ acf_add_local_field_group(edris_with_de_fields(array(
                     'media_upload' => 1,
                     'delay' => 0,
                     'parent_repeater' => 'field_service_sections',
+                ),
+            ),
+        ),
+
+        // --- What you get and how it works ---
+        array(
+            'key' => 'field_service_tab_blocks',
+            'label' => 'What you get and steps',
+            'name' => '',
+            'type' => 'tab',
+            'placement' => 'top',
+        ),
+        array(
+            'key' => 'field_service_deliverables',
+            'label' => 'What you get',
+            'name' => 'deliverables',
+            'type' => 'repeater',
+            'instructions' => 'Shown under the hero: an icon, a short title and one sentence each. Four works best. Leave empty to hide the block.',
+            'layout' => 'table',
+            'min' => 0,
+            'max' => 6,
+            'collapsed' => 'field_service_deliverables_title',
+            'button_label' => 'Add item',
+            'sub_fields' => array(
+                array(
+                    'key' => 'field_service_deliverables_icon',
+                    'label' => 'Icon',
+                    'name' => 'icon',
+                    'type' => 'select',
+                    'choices' => $headless_pro_service_icons,
+                    'default_value' => 'code',
+                    'return_format' => 'value',
+                    'parent_repeater' => 'field_service_deliverables',
+                ),
+                array(
+                    'key' => 'field_service_deliverables_title',
+                    'label' => 'Title',
+                    'name' => 'title',
+                    'type' => 'text',
+                    'parent_repeater' => 'field_service_deliverables',
+                ),
+                array(
+                    'key' => 'field_service_deliverables_text',
+                    'label' => 'Text',
+                    'name' => 'text',
+                    'type' => 'textarea',
+                    'rows' => 2,
+                    'new_lines' => '',
+                    'parent_repeater' => 'field_service_deliverables',
+                ),
+            ),
+        ),
+        array(
+            'key' => 'field_service_process',
+            'label' => 'How it works',
+            'name' => 'process',
+            'type' => 'repeater',
+            'instructions' => 'Numbered steps from first message to launch. Four or five work best. Leave empty to hide the block.',
+            'layout' => 'table',
+            'min' => 0,
+            'max' => 6,
+            'collapsed' => 'field_service_process_title',
+            'button_label' => 'Add step',
+            'sub_fields' => array(
+                array(
+                    'key' => 'field_service_process_title',
+                    'label' => 'Step',
+                    'name' => 'title',
+                    'type' => 'text',
+                    'parent_repeater' => 'field_service_process',
+                ),
+                array(
+                    'key' => 'field_service_process_text',
+                    'label' => 'Text',
+                    'name' => 'text',
+                    'type' => 'textarea',
+                    'rows' => 2,
+                    'new_lines' => '',
+                    'parent_repeater' => 'field_service_process',
                 ),
             ),
         ),
@@ -234,6 +347,18 @@ acf_add_local_field_group(edris_with_de_fields(array(
             'max' => 0,
             'filters' => array('search'),
         ),
+        array(
+            'key' => 'field_service_testimonial',
+            'label' => 'Testimonial',
+            'name' => 'testimonial',
+            'type' => 'relationship',
+            'instructions' => 'One client quote shown on this page. Leave empty to hide it.',
+            'post_type' => array('testimonial'),
+            'return_format' => 'id',
+            'min' => 0,
+            'max' => 1,
+            'filters' => array('search'),
+        ),
 
         // --- Schema ---
         array(
@@ -291,11 +416,20 @@ acf_add_local_field_group(edris_with_de_fields(array(
             'new_lines' => '',
         ),
         array(
+            'key' => 'field_service_contact_message',
+            'label' => 'Prefilled message',
+            'name' => 'contact_message',
+            'type' => 'textarea',
+            'instructions' => 'Text already typed in when a visitor taps Email or WhatsApp on this page, e.g. Hi Edris, my website is: … What happened: … Line breaks are kept. The email subject is the post title.',
+            'rows' => 3,
+            'new_lines' => '',
+        ),
+        array(
             'key' => 'field_service_cta_label',
             'label' => 'Button label',
             'name' => 'cta_label',
             'type' => 'text',
-            'instructions' => 'Text of the button to /contact.',
+            'instructions' => 'Button to /contact, shown only when Site Content has no email address. The page otherwise shows the Email and WhatsApp buttons.',
         ),
     ),
     'location' => $headless_pro_service_location,

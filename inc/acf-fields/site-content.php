@@ -156,6 +156,11 @@ acf_add_local_field_group(edris_with_de_fields(array(
         headless_pro_site_content_text_field('service_faq_heading', 'FAQ heading', 'Heading above the questions on every service page.', 'FAQ', 'text', 'Häufige Fragen'),
         headless_pro_site_content_text_field('service_projects_heading', 'Projects heading', 'Heading above the linked case studies on every service page.', 'Case studies', 'text', 'Fallstudien'),
         headless_pro_site_content_text_field('service_posts_heading', 'Articles heading', 'Heading above the linked articles on every service page.', 'Further reading', 'text', 'Weiterlesen'),
+        headless_pro_site_content_text_field('service_deliverables_heading', 'What you get heading', 'Heading above the icon items on every service page.', 'What you get', 'text', 'Das bekommen Sie'),
+        headless_pro_site_content_text_field('service_process_heading', 'Steps heading', 'Heading above the numbered steps on every service page.', 'How it works', 'text', 'So läuft es ab'),
+        headless_pro_site_content_text_field('service_email_label', 'Email button', 'Label of the email button on every service page (opens a prefilled email).', 'Email me', 'text', 'E-Mail schreiben'),
+        headless_pro_site_content_text_field('service_whatsapp_label', 'WhatsApp button', 'Label of the WhatsApp button on every service page.', 'WhatsApp', 'text', 'WhatsApp'),
+        headless_pro_site_content_text_field('service_portrait_caption', 'Portrait caption', 'Line under the portrait in the hero of every service page.', 'Edris Husein, web developer in Dornbirn', 'text', 'Edris Husein, Webentwickler in Dornbirn'),
 
         // --- Contact page (/contact) ---
         headless_pro_site_content_tab('contact_page', 'Contact page'),
@@ -163,6 +168,11 @@ acf_add_local_field_group(edris_with_de_fields(array(
         headless_pro_site_content_text_field('contact_page_heading', 'Heading', 'Large heading on /contact.', 'Start a project'),
         headless_pro_site_content_text_field('contact_page_intro', 'Intro paragraph', 'Paragraph under the heading on /contact. Plain text.', $headless_pro_contact_intro, 'textarea'),
         headless_pro_site_content_text_field('contact_page_email', 'Email address', 'Address shown and linked on /contact.', 'kontakt@edrishusein.com'),
+        // A setting, not text: empty means no WhatsApp button, so no "Leave empty to show" hint.
+        array_merge(
+            headless_pro_site_content_text_field('contact_whatsapp_number', 'WhatsApp number', '', ''),
+            array('instructions' => 'e.g. +43 676 1234567, or 0676 1234567 (a number starting with 0 gets +43). Service pages then show a WhatsApp button with a prefilled message. Empty hides the button.')
+        ),
 
         // --- Notebook page (/notebook) ---
         headless_pro_site_content_tab('notebook_page', 'Notebook page'),
