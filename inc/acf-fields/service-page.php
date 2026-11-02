@@ -365,6 +365,13 @@ acf_add_local_field_group(edris_with_de_fields(array(
             'instructions' => 'Line under the showcase image, e.g. Monthly maintenance report, September 2026.',
         ),
         array(
+            'key' => 'field_service_showcase_alt',
+            'label' => 'Showcase image description (alt)',
+            'name' => 'showcase_alt',
+            'type' => 'text',
+            'instructions' => 'What the image shows, for screen readers. Leave empty to use the alt text from the media library. The German twin describes it on /de.',
+        ),
+        array(
             'key' => 'field_service_testimonial',
             'label' => 'Testimonial',
             'name' => 'testimonial',
